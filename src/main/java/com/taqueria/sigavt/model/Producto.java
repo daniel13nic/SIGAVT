@@ -39,4 +39,5 @@ public class Producto {
     @Column(nullable = false)
     private Boolean activo = true;
 
+
 }
