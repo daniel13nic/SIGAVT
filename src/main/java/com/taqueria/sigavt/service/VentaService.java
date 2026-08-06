@@ -33,8 +33,7 @@ public class VentaService {
         }
 
         // Total de la venta
-        BigDecimal cantidad = new BigDecimal(venta.getCantidad());
-        BigDecimal total = cantidad.multiply(productoDb.getPrecio());
+        BigDecimal total = venta.getCantidad().multiply(productoDb.getPrecio());
 
         venta.setTotalVenta(total);
 

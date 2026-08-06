@@ -36,8 +36,8 @@ public class Venta {
     @Column(name = "fecha_venta", nullable = false)
     private LocalDate fechaVenta;
 
-    @Column(nullable = false)
-    private Integer cantidad;
+    @Column(nullable = false, precision = 10, scale = 3)
+    private BigDecimal cantidad;
 
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
