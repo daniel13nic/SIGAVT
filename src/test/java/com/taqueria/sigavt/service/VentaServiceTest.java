@@ -50,10 +50,9 @@ class VentaServiceTest {
         when(productoRepository.findById(1)).thenReturn(Optional.of(carnePastor));
         when(ventaRepository.save(any(Venta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // 2. ACT (Ejecutar)
+
         Venta ventaResultado = ventaService.registrarVenta(ventaEntrada);
 
-        // 3. ASSERT (Verificar)
         assertNotNull(ventaResultado);
         // total: 2.5 kg * $250.00 = $625.000
         assertEquals(new BigDecimal("625.000"), ventaResultado.getTotalVenta());
@@ -83,13 +82,12 @@ class VentaServiceTest {
         // Verificamos que lanza el mensaje de error exacto
         assertEquals("Operación denegada: No se puede registrar una venta para un producto inactivo.", excepcion.getMessage());
 
-        // Verificamos que, al dar error, la venta NUNCA se intentó guardar en BD
+        // Al dar error, la venta NUNCA se intentó guardar en BD
         verify(ventaRepository, never()).save(any(Venta.class));
     }
 
     @Test
     void registrarVenta_ProductoInexistente_LanzaExcepcion() {
-        // 1. ARRANGE
         Producto productoFantasma = new Producto();
         productoFantasma.setIdProducto(99);
 
@@ -98,10 +96,8 @@ class VentaServiceTest {
         // Intento de vender 1.5 kg de un producto que no existe en el catálogo
         ventaEntrada.setCantidad(new BigDecimal("1.500"));
 
-        // Simulamos que la base de datos devuelve vacío
         when(productoRepository.findById(99)).thenReturn(Optional.empty());
 
-        // 2. ACT & 3. ASSERT
         RuntimeException excepcion = assertThrows(RuntimeException.class, () -> {
             ventaService.registrarVenta(ventaEntrada);
         });
