@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Componentes Base</title>
+</head>
+<body>
+
+<!-- FRAGMENTO 1: EL MENÚ DE NAVEGACIÓN -->
+<nav th:fragment="menu-principal" class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" th:href="@{/}">SIGAVT</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/ventas}">Ventas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/productos}">Productos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/reportes}">Reportes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/usuarios}">Usuarios</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Fragmento del pie de página -->
+<footer th:fragment="pie-pagina" class="bg-dark text-white text-center py-3 mt-auto">
+    <div class="container">
+
+        <p class="mb-0">Sistema de Gestión y Análisis de Ventas para Taquería (SIGAVT) &copy; 2026</p>
+        <p class="mb-0"><small>Daniel Nicolás Feregrino</small></p>
+
+    </div>
+</footer>
+
+</body>
+</html>
