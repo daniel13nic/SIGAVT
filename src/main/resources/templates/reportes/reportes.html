@@ -5,18 +5,280 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes - SIGAVT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+<!-- Menú inyectado -->
 <div th:replace="~{layout/componentes :: menu-principal}"></div>
 
-<main class="container my-5 flex-grow-1">
-    <h2>Análisis y reportes</h2>
-    <hr>
-    <p>Reportes: ventas por día, ventas por periodo y productos más vendidos.</p>
+<main class="container-fluid px-5 my-4 flex-grow-1" style="max-width: 1400px;">
+
+    <!-- Encabezado y Botones de Exportación -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Reportes</h2>
+            <p class="text-secondary">Analiza el desempeño de ventas por periodo, categoría y usuario</p>
+        </div>
+        <div>
+            <button class="btn btn-outline-naranja me-2 bg-white fw-semibold">
+                <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+            </button>
+            <button class="btn btn-outline-naranja bg-white fw-semibold">
+                <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- Barra de Filtros (Ventas por periodo) -->
+    <div class="tarjeta-filtro p-4 mb-4">
+        <form class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Desde</label>
+                <input type="date" class="form-control" value="2026-08-06">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Hasta</label>
+                <input type="date" class="form-control" value="2026-08-12">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Categoría</label>
+                <select class="form-select">
+                    <option>Todas las categorías</option>
+                    <option>Carnes</option>
+                    <option>Bebidas</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Usuario</label>
+                <select class="form-select">
+                    <option>Todos los usuarios</option>
+                    <option>Daniel N.</option>
+                    <option>Areli G.</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-naranja w-100 fw-bold">
+                    <i class="bi bi-funnel"></i> Aplicar filtros
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Fila de Tarjetas de Métricas -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3"><i class="bi bi-cash"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Total vendido</p>
+                        <h4 class="fw-bold mb-0">$16,780</h4>
+                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 9% vs semana anterior</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3 border-left-secondary" style="border-left-color: #6c757d;">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108,117,125,0.1);"><i class="bi bi-receipt"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Ventas registradas</p>
+                        <h4 class="fw-bold mb-0">212</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3 border-left-secondary" style="border-left-color: #6c757d;">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108,117,125,0.1);"><i class="bi bi-graph-up"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Venta promedio</p>
+                        <h4 class="fw-bold mb-0">$79</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3 border-left-secondary" style="border-left-color: #6c757d;">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108,117,125,0.1);"><i class="bi bi-award"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Categoría top</p>
+                        <h4 class="fw-bold mb-0">Carnes</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Gráficas -->
+    <div class="row g-4 mb-4">
+        <!-- Gráfica de Barras (Ventas por día) -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0">Ventas por día</h6>
+                        <span class="text-secondary small">6 - 12 de agosto</span>
+                    </div>
+
+                    <div class="contenedor-barras">
+                        <!-- Lun -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$2,100</span>
+                            <div class="barra-grafico" style="height: 65%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Lun</span>
+                        </div>
+                        <!-- Mar -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$1,800</span>
+                            <div class="barra-grafico" style="height: 55%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Mar</span>
+                        </div>
+                        <!-- Mie -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$2,400</span>
+                            <div class="barra-grafico" style="height: 75%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Mié</span>
+                        </div>
+                        <!-- Jue -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$1,950</span>
+                            <div class="barra-grafico" style="height: 60%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Jue</span>
+                        </div>
+                        <!-- Vie -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$2,650</span>
+                            <div class="barra-grafico" style="height: 82%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Vie</span>
+                        </div>
+                        <!-- Sab -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$3,100</span>
+                            <div class="barra-grafico" style="height: 100%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Sáb</span>
+                        </div>
+                        <!-- Dom -->
+                        <div class="columna-barra">
+                            <span class="small fw-semibold mb-1 text-secondary">$2,140</span>
+                            <div class="barra-grafico" style="height: 66%;"></div>
+                            <span class="small mt-2 text-muted fw-semibold">Dom</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfica de Dona (Ventas por categoría) -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4">Ventas por categoría</h6>
+
+                    <div class="d-flex align-items-center justify-content-between">
+                        <!-- Dona CSS -->
+                        <div class="grafico-dona shadow-sm">
+                            <div class="centro-dona">
+                                <h5 class="fw-bold mb-0">$16.8k</h5>
+                                <span class="small text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Total</span>
+                            </div>
+                        </div>
+
+                        <!-- Leyenda -->
+                        <div class="ms-4 w-100">
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span><i class="bi bi-square-fill text-naranja me-2"></i>Carnes</span>
+                                <span class="fw-bold">52%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span><i class="bi bi-square-fill me-2" style="color: #f4a261;"></i>Bebidas</span>
+                                <span class="fw-bold">23%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span><i class="bi bi-square-fill me-2" style="color: #e9c46a;"></i>Complementos</span>
+                                <span class="fw-bold">18%</span>
+                            </div>
+                            <div class="d-flex justify-content-between small">
+                                <span><i class="bi bi-square-fill me-2" style="color: #adb5bd;"></i>Postres</span>
+                                <span class="fw-bold">7%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filas de Tops -->
+    <div class="row g-4 mb-4">
+        <!-- Top Productos -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4">Top productos</h6>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Carne al Pastor <span class="text-muted fw-normal">(20 kg vendidos)</span></span>
+                            <span class="fw-bold small">$3,600</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar progreso-naranja" style="width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Bistec <span class="text-muted fw-normal">(14 kg vendidos)</span></span>
+                            <span class="fw-bold small">$2,800</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar progreso-naranja" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ventas por Usuario -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4">Ventas por usuario</h6>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Daniel N. <span class="text-muted fw-normal">(34 ventas registradas)</span></span>
+                            <span class="fw-bold small">$5,120</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar progreso-naranja" style="width: 75%;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Areli G. <span class="text-muted fw-normal">(21 ventas registradas)</span></span>
+                            <span class="fw-bold small">$3,050</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar progreso-naranja" style="width: 45%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
+<!-- Pie de página inyectado -->
 <div th:replace="~{layout/componentes :: pie-pagina}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -20,15 +20,13 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
+
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
-                <!-- Elemento activo con borde inferior -->
-                <li class="nav-item me-3">
-                    <a class="nav-link active fw-semibold" style="border-bottom: 2px solid #e86c27; color: white;" th:href="@{/}">Inicio</a>
-                </li>
-                <li class="nav-item me-3"><a class="nav-link text-light" th:href="@{/ventas}">Ventas</a></li>
-                <li class="nav-item me-3"><a class="nav-link text-light" th:href="@{/productos}">Productos</a></li>
-                <li class="nav-item me-3"><a class="nav-link text-light" th:href="@{/reportes}">Reportes</a></li>
-                <li class="nav-item"><a class="nav-link text-light" th:href="@{/usuarios}">Usuarios</a></li>
+                <li class="nav-item me-3"><a class="nav-link" th:href="@{/}">Inicio</a></li>
+                <li class="nav-item me-3"><a class="nav-link" th:href="@{/ventas}">Ventas</a></li>
+                <li class="nav-item me-3"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
+                <li class="nav-item me-3"><a class="nav-link" th:href="@{/reportes}">Reportes</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/usuarios}">Usuarios</a></li>
             </ul>
 
             <!-- Perfil de usuario -->
@@ -47,8 +45,30 @@
 <footer th:fragment="pie-pagina" style="background-color: #212529; color: #a0a0a0;" class="text-center py-4 mt-auto">
     <div class="container">
         <p class="mb-1 fw-semibold text-light">Sistema de Gestión y Análisis de Ventas para Taquería (SIGAVT) &copy; 2026</p>
-        <p class="mb-0"><small>Daniel Nicolás Feregrino</small></p>
+        <p class="mb-0"><small>Desarrollado por Daniel Nicolás Feregrino - UNAM DGTIC</small></p>
     </div>
+
+    <!-- Script para el menú activo -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let rutaActual = window.location.pathname;
+            let enlaces = document.querySelectorAll('.navbar-nav .nav-link');
+
+            enlaces.forEach(function(enlace) {
+                let rutaEnlace = enlace.getAttribute('href');
+
+                if (rutaActual === rutaEnlace || (rutaEnlace !== '/' && rutaActual.startsWith(rutaEnlace))) {
+                    enlace.classList.add('active', 'fw-semibold', 'text-white');
+                    enlace.classList.remove('text-light');
+                    enlace.style.borderBottom = '2px solid #e86c27';
+                } else {
+                    enlace.classList.add('text-light');
+                    enlace.classList.remove('active', 'fw-semibold', 'text-white');
+                    enlace.style.borderBottom = 'none';
+                }
+            });
+        });
+    </script>
 </footer>
 
 </body>
