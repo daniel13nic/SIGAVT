@@ -4,19 +4,221 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios - SIGAVT</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+<!-- Menú  -->
 <div th:replace="~{layout/componentes :: menu-principal}"></div>
 
-<main class="container my-5 flex-grow-1">
-    <h2>Gestión de usuarios</h2>
-    <hr>
-    <p>Módulo para el manejo de operadores, administradores y control de acceso.</p>
+<main class="container-fluid px-5 my-4 flex-grow-1" style="max-width: 1400px;">
+
+    <!-- Encabezado -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-0">Gestión de Usuarios</h2>
+        <p class="text-secondary">Administra las cuentas de acceso, operadores y perfiles del sistema.</p>
+    </div>
+
+    <!-- Tarjetas de Métricas de Usuarios -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3"><i class="bi bi-people"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Total de usuarios</p>
+                        <h4 class="fw-bold mb-0">5</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #0d6efd;">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3" style="color: #0d6efd; background-color: rgba(13, 110, 253, 0.1);"><i class="bi bi-shield-lock"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Administradores</p>
+                        <h4 class="fw-bold mb-0">2</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #198754;">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3" style="color: #198754; background-color: rgba(25, 135, 84, 0.1);"><i class="bi bi-person-workspace"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Operadores</p>
+                        <h4 class="fw-bold mb-0">2</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #6c757d;">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108, 117, 125, 0.1);"><i class="bi bi-clipboard-data"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Consultores</p>
+                        <h4 class="fw-bold mb-0">1</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal Dividido -->
+    <div class="row g-4">
+
+        <!-- Columna Izquierda: Formulario (Alta/Edición) -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0" style="border-radius: 12px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-1">Registrar Usuario</h5>
+                    <p class="text-secondary small mb-4">Crea una nueva cuenta de acceso al sistema.</p>
+
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nombre completo</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
+                                <input type="text" class="form-control" placeholder="Ej. Juan Pérez">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Perfil de acceso</label>
+                            <select class="form-select">
+                                <option value="" disabled selected>Selecciona un perfil...</option>
+                                <option>Administrador del sistema</option>
+                                <option>Operador (Registro de ventas)</option>
+                                <option>Consultor (Solo reportes)</option>
+                            </select>
+                        </div>
+
+                        <hr class="my-4 text-muted">
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nombre de usuario (Username)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">@</span>
+                                <input type="text" class="form-control" placeholder="Ej. jperez">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Contraseña temporal</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-key text-muted"></i></span>
+                                <input type="password" class="form-control" placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-naranja w-100 py-2 fw-bold">
+                            <i class="bi bi-person-plus me-1"></i> Guardar usuario
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Tabla de Directorio -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
+                <div class="card-body p-4">
+
+                    <!-- Barra de Herramientas -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar por nombre o usuario...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select">
+                                <option>Todos los perfiles</option>
+                                <option>Administradores</option>
+                                <option>Operadores</option>
+                                <option>Consultores</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Datos -->
+                    <div class="table-responsive">
+                        <table class="table table-hover tabla-ventas mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre Completo</th>
+                                <th>Usuario</th>
+                                <th class="text-center">Perfil</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-secondary">U-001</td>
+                                <td class="fw-semibold">Daniel N. Feregrino</td>
+                                <td class="text-muted">@danielf</td>
+                                <td class="text-center"><span class="badge bg-primary">Administrador</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary">U-002</td>
+                                <td class="fw-semibold">Areli Gómez</td>
+                                <td class="text-muted">@arelig</td>
+                                <td class="text-center"><span class="badge bg-success">Operador</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary">U-003</td>
+                                <td class="fw-semibold">Roberto Martínez</td>
+                                <td class="text-muted">@robertom</td>
+                                <td class="text-center"><span class="badge bg-secondary">Consultor</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                        <span class="text-secondary small">Mostrando 3 de 5 usuarios</span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                                <li class="page-item active"><a class="page-link" style="background-color: #e86c27; border-color: #e86c27;" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link text-secondary" href="#">Siguiente</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
 </main>
 
+<!-- Pie de página  -->
 <div th:replace="~{layout/componentes :: pie-pagina}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
