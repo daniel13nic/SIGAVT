@@ -5,33 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - SIGAVT</title>
 
-    <!-- Bootstrap desde la nube para dar estilo rápido y que sea responsive -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-</head>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+
+
+</head>
 <body class="d-flex flex-column min-vh-100">
 
-<!-- Thymeleaf. Se inyecta el menú completo -->
+<!-- Menú (fragmento) -->
 <div th:replace="~{layout/componentes :: menu-principal}"></div>
 
-<!-- Contenido de esta página específica -->
-<main class="container my-5 flex-grow-1">
-    <div class="text-center">
-        <h1 class="display-4">Bienvenido a SIGAVT</h1>
-        <p class="lead">Sistema de Gestión y Análisis de Ventas para Taquería</p>
-        <hr class="my-4">
+<!-- Contenedor Principal -->
+<main class="container-fluid px-5 my-4 flex-grow-1" style="max-width: 1400px;">
 
-        <p>Esta página principal sirve como punto de entrada al sistema, diseñado para optimizar la administración
-            diaria y facilitar el registro digital de las ventas del negocio.</p>
-        <p>Por favor, seleccione una opción en el menú superior para comenzar a operar.</p>
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <h2 class="fw-bold mb-0">Bienvenido a SIGAVT</h2>
+        <a th:href="@{/ventas}" class="btn btn-naranja px-4 py-2 fw-bold shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nueva venta
+        </a>
+    </div>
+    <p class="text-muted mb-4">Taquería Cristo Rey</p>
+
+    <div class="mb-5">
+        <p class="lead fw-semibold mb-1">Sistema de Gestión y Análisis de Ventas</p>
+        <p class="text-secondary">Por favor, seleccione una opción en el menú superior o en los accesos rápidos para comenzar a operar.</p>
+    </div>
+
+    <!-- Fila de tarjetas de datos -->
+    <div class="row g-4 mb-5">
+        <!-- Ventas de hoy -->
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3"><i class="bi bi-cash-stack"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Ventas de hoy</p>
+                        <h3 class="fw-bold mb-0">$4,285</h3>
+                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 12% vs ayer</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Artículos vendidos (Corregido según alcance del sistema) -->
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3"><i class="bi bi-basket"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Artículos vendidos</p>
+                        <h3 class="fw-bold mb-0">63</h3>
+                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 8% vs ayer</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Productos (Corregido sin control de stock) -->
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3"><i class="bi bi-box-seam"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Productos activos</p>
+                        <h3 class="fw-bold mb-0">38</h3>
+                        <small class="text-success fw-bold"><i class="bi bi-check2-circle"></i> Catálogo al día</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Usuarios -->
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icono-metrica me-3"><i class="bi bi-people"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Usuarios activos</p>
+                        <h3 class="fw-bold mb-0">5</h3>
+                        <small class="text-success fw-bold">Todos conectados</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de accesos rápidos -->
+    <h6 class="text-uppercase text-secondary fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem;">Accesos Rápidos</h6>
+    <div class="row g-4 mb-4">
+
+        <!-- Acceso: Ventas -->
+        <div class="col-md-3">
+            <div class="card tarjeta-acceso p-4">
+                <div class="icono-metrica mb-3"><i class="bi bi-wallet2"></i></div>
+                <h5 class="fw-bold">Ventas</h5>
+                <p class="text-secondary small mb-4">Registra nuevos tickets y consulta el corte del día.</p>
+                <a th:href="@{/ventas}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Ventas &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Acceso: Productos -->
+        <div class="col-md-3">
+            <div class="card tarjeta-acceso p-4">
+                <div class="icono-metrica mb-3"><i class="bi bi-box"></i></div>
+                <h5 class="fw-bold">Productos</h5>
+                <p class="text-secondary small mb-4">Administra el menú, precios y disponibilidad.</p>
+                <a th:href="@{/productos}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Productos &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Acceso: Reportes -->
+        <div class="col-md-3">
+            <div class="card tarjeta-acceso p-4">
+                <div class="icono-metrica mb-3"><i class="bi bi-bar-chart-line"></i></div>
+                <h5 class="fw-bold">Reportes</h5>
+                <p class="text-secondary small mb-4">Analiza ventas por periodo, producto y turno.</p>
+                <a th:href="@{/reportes}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Reportes &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Acceso: Usuarios -->
+        <div class="col-md-3">
+            <div class="card tarjeta-acceso p-4">
+                <div class="icono-metrica mb-3"><i class="bi bi-person-gear"></i></div>
+                <h5 class="fw-bold">Usuarios</h5>
+                <p class="text-secondary small mb-4">Gestiona cuentas, roles y permisos del sistema.</p>
+                <a th:href="@{/usuarios}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Usuarios &rarr;</a>
+            </div>
+        </div>
+
     </div>
 </main>
 
-<!-- se inyecta el pie de página -->
+<!-- Pie de página (fragmento) -->
 <div th:replace="~{layout/componentes :: pie-pagina}"></div>
 
-<!-- Bootstrappara que el menú funcione en celulares -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
