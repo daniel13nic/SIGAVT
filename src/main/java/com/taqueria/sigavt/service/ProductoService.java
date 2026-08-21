@@ -16,7 +16,7 @@ public class ProductoService {
         this.productoRepository = productoRepository;
     }
 
-    // catálogo completo (para el administrador)
+    // Catálogo completo (para el administrador)
     public List<Producto> obtenerTodos() {
         return productoRepository.findAll();
     }
@@ -28,6 +28,11 @@ public class ProductoService {
 
     // Dar de alta o modificar un producto
     public Producto guardarProducto(Producto producto) {
+        // espacios accidentales y se guarda todo en mayúsculas para estandarizar
+        if (producto.getNombre() != null) {
+            producto.setNombre(producto.getNombre().trim().toUpperCase());
+        }
+
         if (producto.getIdProducto() == null) {
             producto.setActivo(true);
         }
@@ -43,12 +48,12 @@ public class ProductoService {
         return productoRepository.save(productoDb);
     }
 
-    // Desactivar producto
+    // orrado lógico para no corromper la BD
     public void desactivarProducto(Integer idProducto) {
         Producto productoDb = productoRepository.findById(idProducto)
                 .orElseThrow(() -> new RuntimeException("Error: El producto especificado no existe."));
 
-        productoDb.setActivo(false);
+        productoDb.setActivo(false); // Se desactiva  en lugar de hacer DELETE
         productoRepository.save(productoDb);
     }
 }
