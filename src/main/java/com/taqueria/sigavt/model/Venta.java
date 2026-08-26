@@ -44,8 +44,6 @@ public class Venta {
     @Column(nullable = false, precision = 10, scale = 3)
     private BigDecimal cantidad;
 
-    @NotNull(message = "El precio unitario no puede estar vacío.")
-    @DecimalMin(value = "0.01", message = "El precio unitario debe ser mayor a cero.")
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 

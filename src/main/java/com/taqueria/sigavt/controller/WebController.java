@@ -12,16 +12,32 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.taqueria.sigavt.model.Venta;
+import com.taqueria.sigavt.service.VentaService;
+import com.taqueria.sigavt.repository.UsuarioRepository;
+import com.taqueria.sigavt.repository.VentaRepository;
+
 @Controller
 public class WebController {
 
     private final ProductoService productoService;
     private final CategoriaRepository categoriaRepository;
+    private final VentaService ventaService;
+    private final UsuarioRepository usuarioRepository;
+    private final VentaRepository ventaRepository;
 
-    public WebController(ProductoService productoService, CategoriaRepository categoriaRepository) {
+    public WebController(ProductoService productoService,
+                         CategoriaRepository categoriaRepository,
+                         VentaService ventaService,
+                         UsuarioRepository usuarioRepository,
+                         VentaRepository ventaRepository) {
         this.productoService = productoService;
         this.categoriaRepository = categoriaRepository;
+        this.ventaService = ventaService;
+        this.usuarioRepository = usuarioRepository;
+        this.ventaRepository = ventaRepository;
     }
+
 
     // Ruta de la página principal
     @GetMapping("/")
@@ -29,11 +45,84 @@ public class WebController {
         return "inicio";
     }
 
-    // Ruta para el módulo de ventas
+
+    // Módulo de Ventas
     @GetMapping("/ventas")
-    public String mostrarVentas() {
+    public String mostrarVentas(Model model) {
+        if (!model.containsAttribute("venta")) {
+            model.addAttribute("venta", new Venta());
+        }
+
+        var listaProductos = productoService.obtenerActivos();
+        var listaUsuarios = usuarioRepository.findAll();
+        var listaVentas = ventaRepository.findAll();
+
+
+        // Registros del día
+        long registrosHoy = listaVentas.stream()
+                .filter(v -> v.getFechaVenta() != null && v.getFechaVenta().isEqual(java.time.LocalDate.now()))
+                .count();
+
+        // Total vendido
+        java.math.BigDecimal totalVendido = listaVentas.stream()
+                .map(Venta::getTotalVenta)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        // Venta promedio
+        java.math.BigDecimal ventaPromedio = java.math.BigDecimal.ZERO;
+        if (!listaVentas.isEmpty()) {
+            ventaPromedio = totalVendido.divide(java.math.BigDecimal.valueOf(listaVentas.size()), 2, java.math.RoundingMode.HALF_UP);
+        }
+
+        // Producto Top
+        String productoTop = "N/A";
+        if (!listaVentas.isEmpty()) {
+            productoTop = listaVentas.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(v -> v.getProducto().getNombre(), java.util.stream.Collectors.counting()))
+                    .entrySet().stream()
+                    .max(java.util.Map.Entry.comparingByValue())
+                    .map(java.util.Map.Entry::getKey)
+                    .orElse("N/A");
+        }
+
+        // Enviamos las listas
+        model.addAttribute("listaProductos", listaProductos);
+        model.addAttribute("listaUsuarios", listaUsuarios);
+        model.addAttribute("listaVentas", listaVentas);
+
+        // Enviamos las métricas
+        model.addAttribute("registrosHoy", registrosHoy);
+        model.addAttribute("totalVendido", totalVendido);
+        model.addAttribute("ventaPromedio", ventaPromedio);
+        model.addAttribute("productoTop", productoTop);
+
         return "ventas/ventas";
     }
+
+    @PostMapping("/ventas/guardar")
+    public String guardarVenta(@Valid @ModelAttribute("venta") Venta venta,
+                               BindingResult result,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("listaProductos", productoService.obtenerActivos());
+            model.addAttribute("listaUsuarios", usuarioRepository.findAll());
+            model.addAttribute("listaVentas", ventaRepository.findAll());
+            return "ventas/ventas";
+        }
+
+        try {
+            // lógica de negocio
+            ventaService.registrarVenta(venta);
+            redirectAttributes.addFlashAttribute("mensajeExito", "¡Venta registrada! El total se calculó automáticamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", e.getMessage());
+        }
+
+        return "redirect:/ventas";
+    }
+
 
 
     //   Módulo de Productos
