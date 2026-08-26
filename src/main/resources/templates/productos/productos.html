@@ -16,52 +16,56 @@
 <main class="container-fluid px-5 my-4 flex-grow-1" style="max-width: 1400px;">
 
     <div class="mb-4">
-        <h2 class="fw-bold mb-0">Catálogo de Productos</h2>
+        <h2 class="fw-bold mb-0">Gestión de inventario</h2>
         <p class="text-secondary">Administra los productos, categorías, precios y su estado en el sistema.</p>
     </div>
 
-    <!-- Tarjetas de Métricas del Catálogo -->
+    <!-- Tarjetas de métricas del Catálogo  -->
     <div class="row g-4 mb-4">
+        <!-- Total -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3"><i class="bi bi-box-seam"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Total en catálogo</p>
-                        <h4 class="fw-bold mb-0">38</h4>
+                        <h4 class="fw-bold mb-0" th:text="${totalProductos}">0</h4>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Categorías -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3"><i class="bi bi-tags"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Categorías</p>
-                        <h4 class="fw-bold mb-0">4</h4>
+                        <h4 class="fw-bold mb-0" th:text="${totalCategorias}">0</h4>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Activos -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #198754;">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3" style="color: #198754; background-color: rgba(25, 135, 84, 0.1);"><i class="bi bi-check-circle"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Activos</p>
-                        <h4 class="fw-bold mb-0">36</h4>
+                        <h4 class="fw-bold mb-0" th:text="${totalActivos}">0</h4>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Inactivos -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #dc3545;">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3" style="color: #dc3545; background-color: rgba(220, 53, 69, 0.1);"><i class="bi bi-x-circle"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Inactivos</p>
-                        <h4 class="fw-bold mb-0">2</h4>
+                        <h4 class="fw-bold mb-0" th:text="${totalInactivos}">0</h4>
                     </div>
                 </div>
             </div>
@@ -78,54 +82,63 @@
                     <h5 class="fw-bold mb-1">Nuevo Producto</h5>
                     <p class="text-secondary small mb-4">Ingresa los detalles del artículo.</p>
 
-                    <form>
+
+                    <form th:action="@{/productos/guardar}" th:object="${producto}" method="POST">
+                        <!-- Alerta de éxito -->
+                        <div th:if="${mensajeExito}" class="alert alert-success py-2 small fw-semibold" role="alert">
+                            <i class="bi bi-check-circle me-1"></i> <span th:text="${mensajeExito}"></span>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Nombre del producto</label>
-                            <input type="text" class="form-control" placeholder="Ej. Taco de Pastor">
+                            <input type="text" class="form-control" th:field="*{nombre}" placeholder="Ej. Bistec"
+                                   th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''">
+                            <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="invalid-feedback small"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-semibold">Categoría</label>
-                            <select class="form-select">
+                            <select class="form-select" th:field="*{categoria}" th:classappend="${#fields.hasErrors('categoria')} ? 'is-invalid' : ''">
                                 <option value="" disabled selected>Selecciona una categoría...</option>
-                                <option>Carnes</option>
-                                <option>Bebidas</option>
-                                <option>Complementos</option>
-                                <option>Postres</option>
+                                <option th:each="cat : ${listaCategorias}" th:value="${cat.idCategoria}" th:text="${cat.nombre}"></option>
                             </select>
+                            <div th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}" class="invalid-feedback small"></div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label class="form-label small fw-semibold">Unidad de medida</label>
-                                <select class="form-select">
-                                    <option>pza</option>
-                                    <option>kg</option>
-                                    <option>L</option>
-                                    <option>orden</option>
+                                <select class="form-select" th:field="*{unidadMedida}" th:classappend="${#fields.hasErrors('unidadMedida')} ? 'is-invalid' : ''">
+                                    <option value="pza">pza</option>
+                                    <option value="kg">kg</option>
+                                    <option value="L">L</option>
+                                    <option value="orden">orden</option>
                                 </select>
+                                <div th:if="${#fields.hasErrors('unidadMedida')}" th:errors="*{unidadMedida}" class="invalid-feedback small"></div>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small fw-semibold">Precio</label>
-                                <div class="input-group">
+                                <div class="input-group has-validation">
                                     <span class="input-group-text bg-light text-muted">$</span>
-                                    <input type="number" class="form-control" step="0.01" placeholder="0.00">
+                                    <input type="number" class="form-control" step="0.01" th:field="*{precio}" placeholder="0.00"
+                                           th:classappend="${#fields.hasErrors('precio')} ? 'is-invalid' : ''">
+                                    <div th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}" class="invalid-feedback small"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Checkbox de estado (Activo/Inactivo) -->
                         <div class="mb-4 mt-4">
                             <div class="form-check form-switch d-flex align-items-center">
-                                <input class="form-check-input me-2" type="checkbox" role="switch" id="estadoProducto" checked style="transform: scale(1.2);">
+                                <input class="form-check-input me-2" type="checkbox" role="switch" th:field="*{activo}" id="estadoProducto" style="transform: scale(1.2);">
                                 <label class="form-check-label small fw-semibold ms-1" for="estadoProducto">Producto Activo (Visible en ventas)</label>
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-naranja w-100 py-2 fw-bold">
+                        <button type="submit" class="btn btn-naranja w-100 py-2 fw-bold">
                             <i class="bi bi-save me-1"></i> Guardar producto
                         </button>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -166,38 +179,30 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td class="text-secondary">001</td>
-                                <td class="fw-semibold">Carne al Pastor</td>
-                                <td>Carnes</td>
-                                <td class="text-center"><span class="badge bg-light text-dark border">kg</span></td>
-                                <td class="text-end fw-bold">$260.00</td>
-                                <td class="text-center"><span class="badge bg-success">Activo</span></td>
+                            <tr th:each="prod : ${listaProductos}">
+                                <td class="text-secondary" th:text="${prod.idProducto}">001</td>
+                                <td class="fw-semibold" th:text="${prod.nombre}">Carne al Pastor</td>
+                                <td th:text="${prod.categoria.nombre}">Carnes</td>
+                                <td class="text-center"><span class="badge bg-light text-dark border" th:text="${prod.unidadMedida}">kg</span></td>
+                                <td class="text-end fw-bold" th:text="${'$' + prod.precio}">$260.00</td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
+                                    <!-- Verde si está activo, Rojo si no -->
+                                    <span th:if="${prod.activo}" class="badge bg-success">Activo</span>
+                                    <span th:unless="${prod.activo}" class="badge bg-danger">Inactivo</span>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-secondary">002</td>
-                                <td class="fw-semibold">Refresco de Cola 600ml</td>
-                                <td>Bebidas</td>
-                                <td class="text-center"><span class="badge bg-light text-dark border">pza</span></td>
-                                <td class="text-end fw-bold">$25.00</td>
-                                <td class="text-center"><span class="badge bg-success">Activo</span></td>
+
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-light text-secondary me-1" title="Editar"><i class="bi bi-pencil"></i></button>
+
+                                    <!-- Botón de borrado lógico -->
+                                    <a th:href="@{/productos/eliminar(idProducto=${prod.idProducto})}"
+                                       class="btn btn-sm btn-light text-danger"
+                                       title="Dar de baja"
+                                       onclick="return confirm('¿Estás seguro de dar de baja este producto? Ya no aparecerá en ventas.');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-secondary">003</td>
-                                <td class="fw-semibold text-muted">Orden de Cebollitas</td>
-                                <td>Complementos</td>
-                                <td class="text-center"><span class="badge bg-light text-dark border">orden</span></td>
-                                <td class="text-end fw-bold text-muted">$35.00</td>
-                                <td class="text-center"><span class="badge bg-danger">Inactivo</span></td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
-                                </td>
+
                             </tr>
                             </tbody>
                         </table>

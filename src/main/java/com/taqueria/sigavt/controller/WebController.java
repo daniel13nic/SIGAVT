@@ -39,14 +39,27 @@ public class WebController {
     //   Módulo de Productos
     @GetMapping("/productos")
     public String mostrarProductos(Model model) {
-
-        // objeto vacío para el formulario
         if (!model.containsAttribute("producto")) {
             model.addAttribute("producto", new Producto());
         }
 
-        model.addAttribute("listaCategorias", categoriaRepository.findAll());
-        model.addAttribute("listaProductos", productoService.obtenerTodos());
+        // Se obtienen las listas completas
+        var listaCategorias = categoriaRepository.findAll();
+        var listaProductos = productoService.obtenerTodos();
+
+        // cálculo de las métricas usando
+        long activos = listaProductos.stream().filter(Producto::getActivo).count();
+        long inactivos = listaProductos.size() - activos;
+
+        // Se envian las listas para la tabla y el formulario
+        model.addAttribute("listaCategorias", listaCategorias);
+        model.addAttribute("listaProductos", listaProductos);
+
+        // métricas para las tarjetas superiores de la vista de productos
+        model.addAttribute("totalProductos", listaProductos.size());
+        model.addAttribute("totalCategorias", listaCategorias.size());
+        model.addAttribute("totalActivos", activos);
+        model.addAttribute("totalInactivos", inactivos);
 
         return "productos/productos";
     }
@@ -69,6 +82,14 @@ public class WebController {
         productoService.guardarProducto(producto);
 
         redirectAttributes.addFlashAttribute("mensajeExito", "Producto registrado correctamente");
+        return "redirect:/productos";
+    }
+
+    @GetMapping("/productos/eliminar")
+    public String eliminarProducto(Integer idProducto, RedirectAttributes redirectAttributes) {
+        // borrado lógico
+        productoService.desactivarProducto(idProducto);
+        redirectAttributes.addFlashAttribute("mensajeExito", "Producto dado de baja correctamente.");
         return "redirect:/productos";
     }
 
