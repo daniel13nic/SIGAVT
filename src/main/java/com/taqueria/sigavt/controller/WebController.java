@@ -3,6 +3,7 @@ package com.taqueria.sigavt.controller;
 import com.taqueria.sigavt.model.Producto;
 import com.taqueria.sigavt.repository.CategoriaRepository;
 import com.taqueria.sigavt.service.ProductoService;
+import com.taqueria.sigavt.service.ReporteService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,17 +26,20 @@ public class WebController {
     private final VentaService ventaService;
     private final UsuarioRepository usuarioRepository;
     private final VentaRepository ventaRepository;
+    private final ReporteService reporteService;
 
     public WebController(ProductoService productoService,
                          CategoriaRepository categoriaRepository,
                          VentaService ventaService,
                          UsuarioRepository usuarioRepository,
-                         VentaRepository ventaRepository) {
+                         VentaRepository ventaRepository,
+                         ReporteService reporteService) {
         this.productoService = productoService;
         this.categoriaRepository = categoriaRepository;
         this.ventaService = ventaService;
         this.usuarioRepository = usuarioRepository;
         this.ventaRepository = ventaRepository;
+        this.reporteService = reporteService;
     }
 
 
@@ -45,8 +49,6 @@ public class WebController {
         return "inicio";
     }
 
-
-    // Módulo de Ventas
     @GetMapping("/ventas")
     public String mostrarVentas(Model model) {
         if (!model.containsAttribute("venta")) {
@@ -57,47 +59,17 @@ public class WebController {
         var listaUsuarios = usuarioRepository.findAll();
         var listaVentas = ventaRepository.findAll();
 
-
-        // Registros del día
-        long registrosHoy = listaVentas.stream()
-                .filter(v -> v.getFechaVenta() != null && v.getFechaVenta().isEqual(java.time.LocalDate.now()))
-                .count();
-
-        // Total vendido
-        java.math.BigDecimal totalVendido = listaVentas.stream()
-                .map(Venta::getTotalVenta)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-
-        // Venta promedio
-        java.math.BigDecimal ventaPromedio = java.math.BigDecimal.ZERO;
-        if (!listaVentas.isEmpty()) {
-            ventaPromedio = totalVendido.divide(java.math.BigDecimal.valueOf(listaVentas.size()), 2, java.math.RoundingMode.HALF_UP);
-        }
-
-        // Producto Top
-        String productoTop = "N/A";
-        if (!listaVentas.isEmpty()) {
-            productoTop = listaVentas.stream()
-                    .collect(java.util.stream.Collectors.groupingBy(v -> v.getProducto().getNombre(), java.util.stream.Collectors.counting()))
-                    .entrySet().stream()
-                    .max(java.util.Map.Entry.comparingByValue())
-                    .map(java.util.Map.Entry::getKey)
-                    .orElse("N/A");
-        }
-
-        // Enviamos las listas
         model.addAttribute("listaProductos", listaProductos);
         model.addAttribute("listaUsuarios", listaUsuarios);
         model.addAttribute("listaVentas", listaVentas);
 
-        // Enviamos las métricas
-        model.addAttribute("registrosHoy", registrosHoy);
-        model.addAttribute("totalVendido", totalVendido);
-        model.addAttribute("ventaPromedio", ventaPromedio);
-        model.addAttribute("productoTop", productoTop);
+        model.addAllAttributes(reporteService.calcularMetricasDashboard(listaVentas));
 
         return "ventas/ventas";
     }
+
+
+
 
     @PostMapping("/ventas/guardar")
     public String guardarVenta(@Valid @ModelAttribute("venta") Venta venta,
@@ -195,4 +167,5 @@ public class WebController {
     public String mostrarUsuarios() {
         return "usuarios/usuarios";
     }
+
 }
