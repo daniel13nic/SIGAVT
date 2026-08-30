@@ -4,6 +4,7 @@ import com.taqueria.sigavt.model.Producto;
 import com.taqueria.sigavt.repository.CategoriaRepository;
 import com.taqueria.sigavt.service.ProductoService;
 import com.taqueria.sigavt.service.ReporteService;
+import com.taqueria.sigavt.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,10 @@ import com.taqueria.sigavt.service.VentaService;
 import com.taqueria.sigavt.repository.UsuarioRepository;
 import com.taqueria.sigavt.repository.VentaRepository;
 
+
+import com.taqueria.sigavt.model.Usuario;
+import com.taqueria.sigavt.repository.PerfilRepository;
+
 @Controller
 public class WebController {
 
@@ -27,19 +32,27 @@ public class WebController {
     private final UsuarioRepository usuarioRepository;
     private final VentaRepository ventaRepository;
     private final ReporteService reporteService;
+    private final PerfilRepository perfilRepository;
+    private final UsuarioService usuarioService;
+
+
 
     public WebController(ProductoService productoService,
                          CategoriaRepository categoriaRepository,
                          VentaService ventaService,
                          UsuarioRepository usuarioRepository,
                          VentaRepository ventaRepository,
-                         ReporteService reporteService) {
+                         ReporteService reporteService,
+                         PerfilRepository perfilRepository,
+                         UsuarioService usuarioService) {
         this.productoService = productoService;
         this.categoriaRepository = categoriaRepository;
         this.ventaService = ventaService;
         this.usuarioRepository = usuarioRepository;
         this.ventaRepository = ventaRepository;
         this.reporteService = reporteService;
+        this.perfilRepository = perfilRepository;
+        this.usuarioService = usuarioService;
     }
 
 
@@ -67,8 +80,6 @@ public class WebController {
 
         return "ventas/ventas";
     }
-
-
 
 
     @PostMapping("/ventas/guardar")
@@ -162,10 +173,45 @@ public class WebController {
         return "reportes/reportes";
     }
 
-    // Ruta para la gestión de operadores
+
+
+    // Módulo de usuarios
     @GetMapping("/usuarios")
-    public String mostrarUsuarios() {
+    public String mostrarUsuarios(Model model) {
+        if (!model.containsAttribute("usuario")) {
+            model.addAttribute("usuario", new Usuario());
+        }
+
+        var listaPerfiles = perfilRepository.findAll();
+        var listaUsuarios = usuarioRepository.findAll();
+
+        model.addAttribute("listaPerfiles", listaPerfiles);
+        model.addAttribute("listaUsuarios", listaUsuarios);
+
+        // DELEGAMOS LA LÓGICA AL SERVICIO (Mejor práctica)
+        model.addAllAttributes(usuarioService.calcularMetricasUsuarios(listaUsuarios));
+
         return "usuarios/usuarios";
+    }
+
+
+    @PostMapping("/usuarios/guardar")
+    public String guardarUsuario(@Valid @ModelAttribute("usuario") Usuario usuario,
+                                 BindingResult result,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("listaPerfiles", perfilRepository.findAll());
+            model.addAttribute("listaUsuarios", usuarioRepository.findAll());
+            return "usuarios/usuarios";
+        }
+
+        // Se guarda el usuario
+        usuarioRepository.save(usuario);
+
+        redirectAttributes.addFlashAttribute("mensajeExito", "¡Usuario registrado correctamente!");
+        return "redirect:/usuarios";
     }
 
 }
