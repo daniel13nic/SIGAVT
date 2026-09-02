@@ -62,6 +62,8 @@ public class WebController {
         return "inicio";
     }
 
+
+
     @GetMapping("/ventas")
     public String mostrarVentas(Model model) {
         if (!model.containsAttribute("venta")) {
@@ -80,7 +82,6 @@ public class WebController {
 
         return "ventas/ventas";
     }
-
 
     @PostMapping("/ventas/guardar")
     public String guardarVenta(@Valid @ModelAttribute("venta") Venta venta,
@@ -165,13 +166,12 @@ public class WebController {
         return "redirect:/productos";
     }
 
-
-
     // Ruta para las métricas
     @GetMapping("/reportes")
     public String mostrarReportes() {
         return "reportes/reportes";
     }
+
 
 
 
@@ -193,7 +193,6 @@ public class WebController {
 
         return "usuarios/usuarios";
     }
-
 
     @PostMapping("/usuarios/guardar")
     public String guardarUsuario(@Valid @ModelAttribute("usuario") Usuario usuario,
