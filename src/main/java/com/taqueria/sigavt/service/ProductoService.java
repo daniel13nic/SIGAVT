@@ -1,7 +1,10 @@
 package com.taqueria.sigavt.service;
 
 import com.taqueria.sigavt.model.Producto;
+import com.taqueria.sigavt.model.Proveedor;
 import com.taqueria.sigavt.repository.ProductoRepository;
+import com.taqueria.sigavt.repository.ProveedorRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,9 +14,13 @@ import java.util.List;
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final ProveedorRepository proveedorRepository;
 
-    public ProductoService(ProductoRepository productoRepository) {
+
+    public ProductoService(ProductoRepository productoRepository,  ProveedorRepository proveedorRepository) {
+
         this.productoRepository = productoRepository;
+        this.proveedorRepository = proveedorRepository;
     }
 
     // Catálogo completo (para el administrador)
@@ -55,5 +62,45 @@ public class ProductoService {
 
         productoDb.setActivo(false); // Se desactiva  en lugar de hacer DELETE
         productoRepository.save(productoDb);
+    }
+
+
+    /* ==============================================================
+    Productos - Proveedores
+    */
+
+
+    public void asociarProveedor(Integer idProducto, Integer idProveedor) {
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(() -> new EntityNotFoundException("El producto con ID " + idProducto + " no existe."));
+
+        Proveedor proveedor = proveedorRepository.findById(idProveedor)
+                .orElseThrow(() -> new EntityNotFoundException("El proveedor con ID " + idProveedor + " no existe."));
+
+        if (!producto.getProveedores().contains(proveedor)) {
+            producto.getProveedores().add(proveedor);
+            productoRepository.save(producto);
+        }
+    }
+
+    public List<Proveedor> obtenerProveedoresDeProducto(Integer idProducto) {
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(() -> new EntityNotFoundException("El producto con ID " + idProducto + " no existe."));
+
+        return producto.getProveedores();
+    }
+
+
+    public void removerProveedor(Integer idProducto, Integer idProveedor) {
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(() -> new EntityNotFoundException("El producto con ID " + idProducto + " no existe."));
+
+        Proveedor proveedor = proveedorRepository.findById(idProveedor)
+                .orElseThrow(() -> new EntityNotFoundException("El proveedor con ID " + idProveedor + " no existe."));
+
+        if (producto.getProveedores().contains(proveedor)) {
+            producto.getProveedores().remove(proveedor);
+            productoRepository.save(producto);
+        }
     }
 }
