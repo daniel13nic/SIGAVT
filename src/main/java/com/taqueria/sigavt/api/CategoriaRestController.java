@@ -36,7 +36,7 @@ public class CategoriaRestController {
     @GetMapping("/{id}/productos")
     public ResponseEntity<List<ProductoDTO>> obtenerProductosPorCategoria(@PathVariable Integer id) {
 
-        // Se buscamos la Categoría, si no existe, GlobalExceptionHandler lanzará un 404
+        // Se busca la Categoría, si no existe, GlobalExceptionHandler lanzará un 404
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("La categoría con ID " + id + " no existe."));
 

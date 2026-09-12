@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,5 +50,14 @@ public class Producto {
     @NotNull(message = "El estado del producto no puede ser nulo.")
     @Column(nullable = false)
     private Boolean activo = true;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "producto_proveedor", // tabla intermedia en BD
+            joinColumns = @JoinColumn(name = "id_producto"),
+            inverseJoinColumns = @JoinColumn(name = "id_proveedor")
+    )
+    private List<Proveedor> proveedores;
 
 }

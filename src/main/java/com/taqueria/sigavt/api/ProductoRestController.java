@@ -2,7 +2,9 @@ package com.taqueria.sigavt.api;
 
 import com.taqueria.sigavt.dto.ProductoDTO;
 import com.taqueria.sigavt.mapper.ProductoMapper;
+import com.taqueria.sigavt.model.Categoria;
 import com.taqueria.sigavt.model.Producto;
+import com.taqueria.sigavt.repository.CategoriaRepository;
 import com.taqueria.sigavt.repository.ProductoRepository;
 import com.taqueria.sigavt.service.ProductoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,42 +23,42 @@ public class ProductoRestController {
     private final ProductoService productoService;
     private final ProductoMapper productoMapper;
     private final ProductoRepository productoRepository;
+    private final CategoriaRepository categoriaRepository; // Inyectamos el repositorio
 
     public ProductoRestController(ProductoService productoService,
                                   ProductoMapper productoMapper,
-                                  ProductoRepository productoRepository) {
+                                  ProductoRepository productoRepository,
+                                  CategoriaRepository categoriaRepository) {
         this.productoService = productoService;
         this.productoMapper = productoMapper;
         this.productoRepository = productoRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
-    // Consulta exitosa 200 OK
     @GetMapping
     public ResponseEntity<List<ProductoDTO>> obtenerTodos() {
         List<ProductoDTO> listaDTO = productoService.obtenerTodos()
                 .stream()
                 .map(productoMapper::aDTO)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(listaDTO);
     }
 
-    // 2. Creación de un recurso 201 Created
     @PostMapping
     public ResponseEntity<ProductoDTO> crearProducto(@Valid @RequestBody ProductoDTO productoDTO) {
-        // Se convierte el DTO a Entidad para que el Service lo entienda
         Producto entidad = productoMapper.aEntidad(productoDTO);
 
-        Producto guardado = productoService.guardarProducto(entidad);
+        // Se verifica que la categoría exista antes de guardar
+        Categoria categoria = categoriaRepository.findById(productoDTO.getIdCategoria())
+                .orElseThrow(() -> new EntityNotFoundException("La categoría con ID " + productoDTO.getIdCategoria() + " no existe en la base de datos."));
+        entidad.setCategoria(categoria);
 
-        // Se convierte de vuelta a DTO para responderle al cliente
+        Producto guardado = productoService.guardarProducto(entidad);
         return ResponseEntity.status(HttpStatus.CREATED).body(productoMapper.aDTO(guardado));
     }
 
-    // Actualización de un recurso 200 OK / 404 Not Found
     @PutMapping("/{id}")
     public ResponseEntity<ProductoDTO> actualizarProducto(@PathVariable Integer id, @Valid @RequestBody ProductoDTO productoDTO) {
-        // Validamos existencia. Si falla, el GlobalExceptionHandler lanza un 404
         Producto existente = productoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("El producto con ID " + id + " no existe."));
 
@@ -64,19 +66,22 @@ public class ProductoRestController {
         entidadActualizada.setIdProducto(id);
         entidadActualizada.setActivo(existente.getActivo());
 
+        // Se verifica la categoría en la actualización
+        Categoria categoria = categoriaRepository.findById(productoDTO.getIdCategoria())
+                .orElseThrow(() -> new EntityNotFoundException("La categoría con ID " + productoDTO.getIdCategoria() + " no existe."));
+        entidadActualizada.setCategoria(categoria);
+
         Producto guardado = productoService.guardarProducto(entidadActualizada);
         return ResponseEntity.ok(productoMapper.aDTO(guardado));
     }
 
-    // Eliminación exitosa (borrado lógico) 204 No Content
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Integer id) {
         productoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("El producto con ID " + id + " no existe."));
 
         productoService.desactivarProducto(id);
-
-        // 204 No Content indica éxito pero sin cuerpo en la respuesta
         return ResponseEntity.noContent().build();
     }
+    //
 }
