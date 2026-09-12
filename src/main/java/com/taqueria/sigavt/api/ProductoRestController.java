@@ -4,6 +4,7 @@ import com.taqueria.sigavt.dto.ProductoDTO;
 import com.taqueria.sigavt.mapper.ProductoMapper;
 import com.taqueria.sigavt.model.Categoria;
 import com.taqueria.sigavt.model.Producto;
+import com.taqueria.sigavt.model.Proveedor;
 import com.taqueria.sigavt.repository.CategoriaRepository;
 import com.taqueria.sigavt.repository.ProductoRepository;
 import com.taqueria.sigavt.service.ProductoService;
@@ -83,5 +84,26 @@ public class ProductoRestController {
         productoService.desactivarProducto(id);
         return ResponseEntity.noContent().build();
     }
-    //
+
+
+    //  201 Created
+    @PostMapping("/{idProducto}/proveedores/{idProveedor}")
+    public ResponseEntity<Void> asociarProveedor(@PathVariable Integer idProducto, @PathVariable Integer idProveedor) {
+        productoService.asociarProveedor(idProducto, idProveedor);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    // Consulta los registros relacionados -> 200 OK
+    @GetMapping("/{idProducto}/proveedores")
+    public ResponseEntity<List<Proveedor>> obtenerProveedoresDeProducto(@PathVariable Integer idProducto) {
+        List<Proveedor> proveedores = productoService.obtenerProveedoresDeProducto(idProducto);
+        return ResponseEntity.ok(proveedores);
+    }
+
+    // Eliminar una asociación -> 204 No Content
+    @DeleteMapping("/{idProducto}/proveedores/{idProveedor}")
+    public ResponseEntity<Void> removerProveedor(@PathVariable Integer idProducto, @PathVariable Integer idProveedor) {
+        productoService.removerProveedor(idProducto, idProveedor);
+        return ResponseEntity.noContent().build();
+    }
 }
