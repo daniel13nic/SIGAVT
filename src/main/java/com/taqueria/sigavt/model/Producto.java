@@ -54,7 +54,7 @@ public class Producto {
 
     @ManyToMany
     @JoinTable(
-            name = "producto_proveedor", // tabla intermedia en BD
+            name = "producto_proveedor",
             joinColumns = @JoinColumn(name = "id_producto"),
             inverseJoinColumns = @JoinColumn(name = "id_proveedor")
     )

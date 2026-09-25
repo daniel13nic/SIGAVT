@@ -2,24 +2,26 @@ package com.taqueria.sigavt.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
+@Table(name = "proveedor")
 public class Proveedor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_proveedor")
     private Integer idProveedor;
 
-    @NotBlank(message = "El nombre del proveedor es obligatorio")
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "nombre", nullable = false, unique = true, length = 100)
     private String nombre;
 
-    @Column(length = 20)
+    @Column(name = "telefono", length = 20)
     private String telefono;
 
     @ManyToMany(mappedBy = "proveedores")
