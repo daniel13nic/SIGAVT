@@ -17,28 +17,33 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<!-- Menú (fragmento) -->
+<!-- Menú -->
 <div th:replace="~{layout/componentes :: menu-principal}"></div>
-
-<!-- Contenedor Principal -->
+<!-- Contenedor principal -->
 <main class="container-fluid px-5 my-4 flex-grow-1" style="max-width: 1400px;">
 
     <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-1">
-        <h2 class="fw-bold mb-0">Bienvenido a SIGAVT</h2>
+        <h2 class="fw-bold mb-0" th:text="'Bienvenido, ' + ${nombreUsuario}">Bienvenido a SIGAVT</h2>
         <a th:href="@{/ventas}" class="btn btn-naranja px-4 py-2 fw-bold shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Nueva venta
         </a>
     </div>
-    <p class="text-muted mb-4">Taquería Cristo Rey</p>
+
+    <!-- fecha con Thymeleaf -->
+    <p class="text-dark fw-medium mb-4" style="opacity: 0.85;">
+        <span th:text="${#strings.capitalize(#temporals.format(fechaActual, 'EEEE, dd ''de'' MMMM ''de'' yyyy'))}">Jueves, 24 de septiembre de 2026</span> &middot; Taquería Cristo Rey
+    </p>
 
     <div class="mb-5">
-        <p class="lead fw-semibold mb-1">Sistema de Gestión y Análisis de Ventas</p>
-        <p class="text-secondary">Por favor, seleccione una opción en el menú superior o en los accesos rápidos para comenzar a operar.</p>
+        <p class="lead fw-bold mb-1 text-dark">Sistema de Gestión y Análisis de Ventas</p>
+        <p class="text-dark fw-medium" style="opacity: 0.85;">Por favor, seleccione una opción en el menú superior o en los ACCESOS RÁPIDOS para comenzar a operar.</p>
     </div>
+
 
     <!-- Fila de tarjetas de datos -->
     <div class="row g-4 mb-5">
+
         <!-- Ventas de hoy -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
@@ -46,54 +51,42 @@
                     <div class="icono-metrica me-3"><i class="bi bi-cash-stack"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Ventas de hoy</p>
-                        <h3 class="fw-bold mb-0">$4,285</h3>
+                        <!-- Formatea a moneda: ej. $4,285.00 -->
+                        <h3 class="fw-bold mb-0" th:text="${'$' + #numbers.formatDecimal(ventasHoy, 1, 'COMMA', 2, 'POINT')}">$0.00</h3>
                         <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 12% vs ayer</small>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Artículos vendidos (Corregido según alcance del sistema) -->
-        <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3">
-                <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3"><i class="bi bi-basket"></i></div>
-                    <div>
-                        <p class="text-secondary mb-0 small fw-semibold">Artículos vendidos</p>
-                        <h3 class="fw-bold mb-0">63</h3>
-                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 8% vs ayer</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Productos (Corregido sin control de stock) -->
+
+        <!-- Productos activos -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3"><i class="bi bi-box-seam"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Productos activos</p>
-                        <h3 class="fw-bold mb-0">38</h3>
+                        <h3 class="fw-bold mb-0" th:text="${productosActivos}">0</h3>
                         <small class="text-success fw-bold"><i class="bi bi-check2-circle"></i> Catálogo al día</small>
                     </div>
                 </div>
             </div>
         </div>
 
-
         <!-- Proveedores -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
-                    <!-- Usamos el ícono de camión de Bootstrap Icons -->
                     <div class="icono-metrica me-3"><i class="bi bi-truck"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Proveedores</p>
-                        <h3 class="fw-bold mb-0">9</h3>
+                        <h3 class="fw-bold mb-0" th:text="${totalProveedores}">0</h3>
                         <small class="text-success fw-bold"><i class="bi bi-check2-circle"></i> Suministro activo</small>
                     </div>
                 </div>
             </div>
         </div>
+
 
 
         <!-- Usuarios -->
@@ -110,9 +103,6 @@
             </div>
         </div>
 
-
-
-
     </div>
 
 
@@ -126,7 +116,7 @@
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-wallet2"></i></div>
                 <h5 class="fw-bold">Ventas</h5>
-                <p class="text-secondary small mb-4">Registra nuevos tickets y consulta el corte del día.</p>
+                <p class="text-secondary small mb-4">Registra nuevas ventas y consulta el corte del día.</p>
                 <a th:href="@{/ventas}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Ventas &rarr;</a>
             </div>
         </div>
@@ -136,7 +126,7 @@
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-box"></i></div>
                 <h5 class="fw-bold">Productos</h5>
-                <p class="text-secondary small mb-4">Administra el menú, precios y disponibilidad.</p>
+                <p class="text-secondary small mb-4">Administra productos, precios y su estado en el sistema.</p>
                 <a th:href="@{/productos}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Productos &rarr;</a>
             </div>
         </div>
@@ -157,7 +147,7 @@
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-bar-chart-line"></i></div>
                 <h5 class="fw-bold">Reportes</h5>
-                <p class="text-secondary small mb-4">Analiza ventas por periodo, producto y turno.</p>
+                <p class="text-secondary small mb-4">Analiza ventas por periodo y categoría.</p>
                 <a th:href="@{/reportes}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Reportes &rarr;</a>
             </div>
         </div>
@@ -171,7 +161,6 @@
                 <a th:href="@{/usuarios}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Usuarios &rarr;</a>
             </div>
         </div>
-
 
 
 

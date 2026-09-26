@@ -2,9 +2,7 @@ package com.taqueria.sigavt.controller;
 
 import com.taqueria.sigavt.model.Producto;
 import com.taqueria.sigavt.repository.CategoriaRepository;
-import com.taqueria.sigavt.service.ProductoService;
-import com.taqueria.sigavt.service.ReporteService;
-import com.taqueria.sigavt.service.UsuarioService;
+import com.taqueria.sigavt.service.*;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,13 +13,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.taqueria.sigavt.model.Venta;
-import com.taqueria.sigavt.service.VentaService;
 import com.taqueria.sigavt.repository.UsuarioRepository;
 import com.taqueria.sigavt.repository.VentaRepository;
 
 
 import com.taqueria.sigavt.model.Usuario;
 import com.taqueria.sigavt.repository.PerfilRepository;
+
+import java.time.LocalDate;
 
 @Controller
 public class WebController {
@@ -34,6 +33,8 @@ public class WebController {
     private final ReporteService reporteService;
     private final PerfilRepository perfilRepository;
     private final UsuarioService usuarioService;
+    private final ProveedorService proveedorService;
+
 
 
 
@@ -44,7 +45,8 @@ public class WebController {
                          VentaRepository ventaRepository,
                          ReporteService reporteService,
                          PerfilRepository perfilRepository,
-                         UsuarioService usuarioService) {
+                         UsuarioService usuarioService,
+                         ProveedorService proveedorService) {
         this.productoService = productoService;
         this.categoriaRepository = categoriaRepository;
         this.ventaService = ventaService;
@@ -53,14 +55,30 @@ public class WebController {
         this.reporteService = reporteService;
         this.perfilRepository = perfilRepository;
         this.usuarioService = usuarioService;
+        this.proveedorService = proveedorService;
     }
 
 
     // Ruta de la página principal
-    @GetMapping("/")
-    public String mostrarInicio() {
+    @GetMapping({"/"})
+    public String mostrarInicio(Model model) {
+        LocalDate hoy = LocalDate.now();
+
+        // nombre de usuario
+        model.addAttribute("nombreUsuario", "Daniel Nicolás");
+        // objeto de fecha actual
+        // model.addAttribute("fechaActual", LocalDate.now());
+        model.addAttribute("fechaActual", hoy);
+
+        // Datos para las tarjetas (las métricas)
+        model.addAttribute("ventasHoy", ventaService.obtenerIngresosDelDia(hoy));
+        model.addAttribute("articulosHoy", ventaService.obtenerArticulosVendidosDelDia(hoy));
+        model.addAttribute("productosActivos", productoService.contarProductosActivos());
+        model.addAttribute("totalProveedores", proveedorService.contarTotalProveedores());
+
         return "inicio";
     }
+
 
 
 

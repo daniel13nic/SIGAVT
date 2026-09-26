@@ -10,7 +10,8 @@ import java.util.List;
 public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     // SELECT * FROM Producto WHERE activo = true
     List<Producto> findByActivoTrue();
-
-
     List<Producto> findByCategoria(Categoria categoria);
+
+    // automáticamente se hace: SELECT COUNT(*) FROM Producto WHERE activo = true
+    long countByActivoTrue();
 }

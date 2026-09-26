@@ -103,4 +103,8 @@ public class ProductoService {
             productoRepository.save(producto);
         }
     }
+
+    public long contarProductosActivos() {
+        return productoRepository.countByActivoTrue();
+    }
 }

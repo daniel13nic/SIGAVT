@@ -6,6 +6,9 @@ import com.taqueria.sigavt.repository.ProductoRepository;
 import com.taqueria.sigavt.repository.VentaRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Service
 public class VentaService {
 
@@ -31,5 +34,17 @@ public class VentaService {
 
         // @PrePersist de la entidad hace la multiplicación automáticamente
         return ventaRepository.save(ventaWeb);
+
     }
+
+    public BigDecimal obtenerIngresosDelDia(LocalDate fecha) {
+        BigDecimal total = ventaRepository.sumarIngresosPorFecha(fecha);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    public BigDecimal obtenerArticulosVendidosDelDia(LocalDate fecha) {
+        BigDecimal total = ventaRepository.sumarArticulosPorFecha(fecha);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
 }

@@ -40,4 +40,8 @@ public class ProveedorService {
 
         proveedorRepository.delete(existente);
     }
+
+    public long contarTotalProveedores() {
+        return proveedorRepository.count();
+    }
 }

@@ -160,3 +160,41 @@ body {
 .progreso-naranja {
     background-color: #e86c27;
 }
+
+
+/* =========================================
+   Pantalla de Proveedores
+   ========================================= */
+
+.scrollable-checkboxes {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.badge-product {
+    background-color: rgba(232, 108, 39, 0.1);
+    color: #e86c27;
+    border: 1px solid rgba(232, 108, 39, 0.2);
+    font-weight: 500;
+    padding: 4px 10px;
+}
+
+.text-orange {
+    color: #e86c27;
+}
+.card-stat {
+    border-left: 5px solid #e86c27;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+.icon-box { background-color: rgba(232, 108, 39, 0.1);
+    color: #e86c27; width: 45px;
+    height: 45px; display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 1.2rem;
+}
