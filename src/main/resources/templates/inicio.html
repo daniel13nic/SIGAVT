@@ -78,6 +78,24 @@
                 </div>
             </div>
         </div>
+
+
+        <!-- Proveedores -->
+        <div class="col-md-3">
+            <div class="card tarjeta-metrica h-100 p-3">
+                <div class="d-flex align-items-center">
+                    <!-- Usamos el ícono de camión de Bootstrap Icons -->
+                    <div class="icono-metrica me-3"><i class="bi bi-truck"></i></div>
+                    <div>
+                        <p class="text-secondary mb-0 small fw-semibold">Proveedores</p>
+                        <h3 class="fw-bold mb-0">9</h3>
+                        <small class="text-success fw-bold"><i class="bi bi-check2-circle"></i> Suministro activo</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <!-- Usuarios -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
@@ -91,7 +109,13 @@
                 </div>
             </div>
         </div>
+
+
+
+
     </div>
+
+
 
     <!-- Sección de accesos rápidos -->
     <h6 class="text-uppercase text-secondary fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem;">Accesos Rápidos</h6>
@@ -117,6 +141,17 @@
             </div>
         </div>
 
+
+        <!-- Proveedores -->
+        <div class="col-md-3">
+            <div class="card tarjeta-acceso p-4">
+                <div class="icono-metrica mb-3"><i class="bi bi-truck"></i></div>
+                <h5 class="fw-bold">Proveedores</h5>
+                <p class="text-secondary small mb-4">Administra a quién le compras insumos y contactos.</p>
+                <a th:href="@{/proveedores}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Proveedores &rarr;</a>
+            </div>
+        </div>
+
         <!-- Acceso: Reportes -->
         <div class="col-md-3">
             <div class="card tarjeta-acceso p-4">
@@ -136,6 +171,9 @@
                 <a th:href="@{/usuarios}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Usuarios &rarr;</a>
             </div>
         </div>
+
+
+
 
     </div>
 </main>
