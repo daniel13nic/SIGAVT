@@ -4,6 +4,8 @@ import com.taqueria.sigavt.model.Producto;
 import com.taqueria.sigavt.model.Venta;
 import com.taqueria.sigavt.repository.ProductoRepository;
 import com.taqueria.sigavt.repository.VentaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -61,6 +63,39 @@ public class VentaService {
     public String obtenerProductoTopDelDia(LocalDate fecha) {
         String producto = ventaRepository.obtenerProductoTopDelDia(fecha);
         return producto != null ? producto : "Sin ventas aún";
+    }
+
+
+    public Page<Venta> obtenerVentasPaginadasYFiltradas(String filtroFecha, String keyword, Integer idCategoria, Pageable pageable) {
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaInicio;
+        LocalDate fechaFin = hoy; // Por defecto, las búsquedas terminan el día actual
+
+        if (filtroFecha == null) {
+            filtroFecha = "hoy";
+        }
+
+        switch (filtroFecha) {
+            case "ayer":
+                fechaInicio = hoy.minusDays(1);
+                fechaFin = hoy.minusDays(1); // inicio y el fin son exactamente ayer
+                break;
+            case "7dias":
+                fechaInicio = hoy.minusDays(7);
+                break;
+            case "este_mes":
+                fechaInicio = hoy.withDayOfMonth(1); // día 1 del mes actual
+                break;
+            case "hoy":
+            default:
+                fechaInicio = hoy;
+                break;
+        }
+
+        String keywordClean = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
+
+        return ventaRepository.buscarVentasConFiltros(fechaInicio, fechaFin, keywordClean, idCategoria, pageable);
     }
 
 

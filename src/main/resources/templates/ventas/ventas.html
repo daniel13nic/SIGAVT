@@ -148,28 +148,36 @@
             <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
                 <div class="card-body p-4">
 
-                    <!-- Barra de Herramientas de la Tabla -->
-                    <div class="row g-2 mb-4">
-                        <div class="col-md-6">
+                    <!-- Formulario de búsqueda y filtros -->
+                    <form method="get" th:action="@{/ventas}" class="row g-2 mb-4" id="formFiltros">
+                        <div class="col-md-5">
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar por folio o producto...">
+                                <input type="text" name="keyword" class="form-control border-start-0 ps-0"
+                                       placeholder="Buscar por folio o producto..."
+                                       th:value="${keywordActual}">
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <select class="form-select">
-                                <option>Todas las categorías</option>
-                                <option>Carnes</option>
-                                <option>Bebidas</option>
+                        <div class="col-md-4">
+                            <!-- Selector de categorías -->
+                            <select name="idCategoria" class="form-select text-primary bg-light border-primary"
+                                    style="opacity: 0.9;" onchange="document.getElementById('formFiltros').submit();">
+                                <option value="">Todas las categorías</option>
+                                <option th:each="cat : ${listaCategorias}"
+                                        th:value="${cat.idCategoria}"
+                                        th:text="${cat.nombre}"
+                                        th:selected="${idCategoriaActual == cat.idCategoria}"></option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-select">
-                                <option>Hoy</option>
-                                <option>Últimos 7 días</option>
+                            <select name="filtroFecha" class="form-select" onchange="document.getElementById('formFiltros').submit();">
+                                <option value="hoy" th:selected="${filtroFechaActual == 'hoy'}">Hoy</option>
+                                <option value="ayer" th:selected="${filtroFechaActual == 'ayer'}">Ayer</option>
+                                <option value="7dias" th:selected="${filtroFechaActual == '7dias'}">Últimos 7 días</option>
+                                <option value="este_mes" th:selected="${filtroFechaActual == 'este_mes'}">Este mes</option>
                             </select>
                         </div>
-                    </div>
+                    </form>
 
                     <!-- Tabla de datos -->
                     <div class="table-responsive">
@@ -188,26 +196,18 @@
                             </thead>
 
                             <tbody>
-                            <tr th:each="v : ${listaVentas}">
-                                <!-- FOLIO -->
+                            <tr th:each="v : ${paginaVentas.content}">
                                 <td class="text-secondary" th:text="${v.idVenta}">1</td>
-                                <!-- PRODUCTO -->
-                                <td class="fw-semibold" th:text="${v.producto.nombre}">Taco de Pastor</td>
-                                <!-- CANTIDAD -->
+                                <td class="fw-semibold text-uppercase" th:text="${v.producto.nombre}">PASTOR</td>
+
+
+                                <td th:text="${v.cantidad} + ' ' + ${v.producto.unidadMedida}">15.400 kg</td>
+                                <td class="text-secondary" th:text="${'$' + #numbers.formatDecimal(v.precioUnitario, 1, 'COMMA', 2, 'POINT')}">$150.00</td>
+                                <td class="fw-bold text-success" th:text="${'$' + #numbers.formatDecimal(v.totalVenta, 1, 'COMMA', 2, 'POINT')}">$2,310.00</td>
+                                <td class="text-secondary small" th:text="${v.usuario.username}">Daniel Nicolás</td>
+                                <td class="text-secondary small" th:text="${#temporals.format(v.fechaVenta, 'yyyy-MM-dd')}">2026-08-25</td>
                                 <td class="text-center">
-                                    <span class="badge bg-light text-dark border" th:text="${v.cantidad} + ' ' + ${v.producto.unidadMedida}">2 pza</span>
-                                </td>
-                                <!-- PRECIO UNITARIO -->
-                                <td class="text-end text-muted" th:text="${'$' + v.precioUnitario}">$15.00</td>
-                                <!-- TOTAL (En verde) -->
-                                <td class="text-end fw-bold text-success" th:text="${'$' + v.totalVenta}">$30.00</td>
-                                <!-- USUARIO -->
-                                <td class="text-center small text-secondary" th:text="${v.usuario.nombre}">Daniel N.</td>
-                                <!-- FECHA -->
-                                <td class="text-muted small" th:text="${v.fechaVenta}">2026-08-20</td>
-                                <!-- ACCIONES -->
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-light text-secondary"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-light text-secondary border"><i class="bi bi-pencil"></i></button>
                                 </td>
                             </tr>
                             </tbody>
@@ -217,13 +217,24 @@
 
                     <!-- Paginación  -->
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                        <span class="text-secondary small">Mostrando 3 de 27 registros</span>
+                        <span class="text-secondary small" th:text="'Mostrando página ' + (${paginaVentas.number + 1}) + ' de ' + ${paginaVentas.totalPages} + ' (' + ${paginaVentas.totalElements} + ' registros)'">Mostrando...</span>
+
                         <nav>
                             <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                                <li class="page-item active"><a class="page-link" style="background-color: #e86c27; border-color: #e86c27;" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link text-secondary" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link text-secondary" href="#">Siguiente</a></li>
+                                <li class="page-item" th:classappend="${paginaVentas.first ? 'disabled' : ''}">
+                                    <!-- Envía todos los parámetros actuales -->
+                                    <a class="page-link text-secondary"
+                                       th:href="@{/ventas(page=${paginaVentas.number - 1}, filtroFecha=${filtroFechaActual}, keyword=${keywordActual}, idCategoria=${idCategoriaActual})}">Anterior</a>
+                                </li>
+
+                                <li class="page-item active">
+                                    <span class="page-link" style="background-color: #e86c27; border-color: #e86c27;" th:text="${paginaVentas.number + 1}">1</span>
+                                </li>
+
+                                <li class="page-item" th:classappend="${paginaVentas.last ? 'disabled' : ''}">
+                                    <a class="page-link text-secondary"
+                                       th:href="@{/ventas(page=${paginaVentas.number + 1}, filtroFecha=${filtroFechaActual}, keyword=${keywordActual}, idCategoria=${idCategoriaActual})}">Siguiente</a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
