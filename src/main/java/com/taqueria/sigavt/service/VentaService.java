@@ -47,4 +47,21 @@ public class VentaService {
         return total != null ? total : BigDecimal.ZERO;
     }
 
+
+    // Para las tarjetas de métricas
+    public long contarVentasDelDia(LocalDate fecha) {
+        return ventaRepository.contarVentasPorFecha(fecha);
+    }
+
+    public BigDecimal obtenerTicketPromedioDelDia(LocalDate fecha) {
+        BigDecimal promedio = ventaRepository.promedioVentasPorFecha(fecha);
+        return promedio != null ? promedio : BigDecimal.ZERO;
+    }
+
+    public String obtenerProductoTopDelDia(LocalDate fecha) {
+        String producto = ventaRepository.obtenerProductoTopDelDia(fecha);
+        return producto != null ? producto : "Sin ventas aún";
+    }
+
+
 }

@@ -23,12 +23,14 @@
 
     <!-- Encabezado -->
     <div class="mb-4">
-        <h2 class="fw-bold mb-0">Ventas</h2>
-        <p class="text-secondary">Registra ventas agregadas de productos y consulta el historial del día.</p>
+        <h2 class="fw-bold mb-1">Ventas</h2>
+        <p class="text-dark fw-medium" style="opacity: 0.85;">Registra ventas agregadas de productos y consulta el historial del día.</p>
     </div>
 
     <!-- Tarjetas de métricas -->
     <div class="row g-4 mb-4">
+
+        <!-- Registros -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
@@ -40,35 +42,41 @@
                 </div>
             </div>
         </div>
+
+        <!-- Total vendido -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #e86c27;">
+            <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3" style="color: #e86c27; background-color: rgba(232, 108, 39, 0.1);"><i class="bi bi-cash"></i></div>
+                    <div class="icono-metrica me-3"><i class="bi bi-cash"></i></div>
                     <div>
-                        <p class="text-secondary mb-0 small fw-semibold">Total vendido</p>
-                        <h4 class="fw-bold mb-0" th:text="${'$' + totalVendido}">$0.00</h4>
+                        <p class="text-secondary mb-0 small fw-semibold">Total cobrado</p>
+                        <h4 class="fw-bold mb-0" th:text="${'$' + #numbers.formatDecimal(totalVendido, 1, 'COMMA', 2, 'POINT')}">$0.00</h4>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Ticket promedio -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #e86c27;">
+            <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3" style="color: #e86c27; background-color: rgba(232, 108, 39, 0.1);"><i class="bi bi-graph-up"></i></div>
+                    <div class="icono-metrica me-3"><i class="bi bi-graph-up"></i></div>
                     <div>
-                        <p class="text-secondary mb-0 small fw-semibold">Venta promedio</p>
-                        <h4 class="fw-bold mb-0" th:text="${'$' + ventaPromedio}">$0.00</h4>
+                        <p class="text-secondary mb-0 small fw-semibold">Ticket promedio</p>
+                        <h4 class="fw-bold mb-0" th:text="${'$' + #numbers.formatDecimal(ventaPromedio, 1, 'COMMA', 2, 'POINT')}">$0.00</h4>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Producto top -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #e86c27;">
+            <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3" style="color: #e86c27; background-color: rgba(232, 108, 39, 0.1);"><i class="bi bi-star"></i></div>
-                    <div>
-                        <p class="text-secondary mb-0 small fw-semibold">Producto top</p>
-                        <h4 class="fw-bold mb-0 text-truncate" style="max-width: 150px;" th:text="${productoTop}">-</h4>
+                    <div class="icono-metrica me-3"><i class="bi bi-star"></i></div>
+                    <div style="overflow: hidden;">
+                        <p class="text-secondary mb-0 small fw-semibold">Producto top (hoy)</p>
+                        <h4 class="fw-bold mb-0 text-uppercase text-truncate" th:text="${productoTop}">-</h4>
                     </div>
                 </div>
             </div>

@@ -58,7 +58,10 @@
             enlaces.forEach(function(enlace) {
                 let rutaEnlace = enlace.getAttribute('href');
 
-                if (rutaActual === rutaEnlace || (rutaEnlace !== '/' && rutaActual.startsWith(rutaEnlace))) {
+                let esInicio = (rutaEnlace === '/' || rutaEnlace === '/inicio') && (rutaActual === '/' || rutaActual === '/inicio');
+                let esOtraRuta = rutaEnlace !== '/' && rutaEnlace !== '/inicio' && rutaActual.startsWith(rutaEnlace);
+
+                if (esInicio || esOtraRuta) {
                     enlace.classList.add('active', 'fw-semibold', 'text-white');
                     enlace.classList.remove('text-light');
                     enlace.style.borderBottom = '2px solid #e86c27';
@@ -70,6 +73,7 @@
             });
         });
     </script>
+
 </footer>
 
 </body>
