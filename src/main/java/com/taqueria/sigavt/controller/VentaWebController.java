@@ -104,7 +104,7 @@ public class VentaWebController {
 
         try {
             ventaService.registrarVenta(venta);
-            redirectAttributes.addFlashAttribute("mensajeExito", "¡Venta registrada! El total se calculó automáticamente.");
+            redirectAttributes.addFlashAttribute("mensajeExito", "¡Venta registrada!.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", e.getMessage());
         }

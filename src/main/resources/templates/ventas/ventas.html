@@ -95,7 +95,7 @@
                     <p class="text-secondary small mb-4">Selecciona el producto y la cantidad vendida.</p>
 
                     <!-- Formulario de Ventas -->
-                    <form th:action="@{/ventas/guardar}" th:object="${venta}" method="POST">
+                    <form id="formNuevaVenta" th:action="@{/ventas/guardar}" th:object="${venta}" method="POST">
 
                         <!-- Alertas -->
                         <div th:if="${mensajeExito}" class="alert alert-success py-2 small fw-semibold" role="alert">
@@ -133,9 +133,11 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-naranja w-100 py-2 fw-bold mt-2">
-                            <i class="bi bi-cart-plus me-1"></i> Registrar Venta
+                        <button type="button" class="btn btn-naranja w-100 py-2 fw-bold mt-4" data-bs-toggle="modal" data-bs-target="#modalConfirmarVenta">
+                            <i class="bi bi-cart-check me-1"></i> Registrar venta
                         </button>
+
+
                     </form>
 
 
@@ -206,9 +208,14 @@
                                 <td class="fw-bold text-success" th:text="${'$' + #numbers.formatDecimal(v.totalVenta, 1, 'COMMA', 2, 'POINT')}">$2,310.00</td>
                                 <td class="text-secondary small" th:text="${v.usuario.username}">Daniel Nicolás</td>
                                 <td class="text-secondary small" th:text="${#temporals.format(v.fechaVenta, 'yyyy-MM-dd')}">2026-08-25</td>
+
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-light text-secondary border"><i class="bi bi-pencil"></i></button>
+                                    <!-- Botón de anular (borrado lógico) -->
+                                    <button class="btn btn-sm btn-light text-danger border" title="Anular ticket">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
                                 </td>
+
                             </tr>
                             </tbody>
 
@@ -244,6 +251,31 @@
         </div>
 
     </div>
+
+
+    <!-- Confirmación de venta -->
+    <div class="modal fade" id="modalConfirmarVenta" tabindex="-1" aria-labelledby="modalConfirmarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalConfirmarLabel">Confirmar Venta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-secondary">
+                    <p>¿Estás seguro de registrar esta venta en el sistema?</p>
+                    <div class="alert alert-warning py-2 small mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Verifica que el producto y la cantidad seleccionada sean correctos. Esta acción actualizará los totales del día.
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                    <!-- SUBMIT del formulario -->
+                    <button type="submit" form="formNuevaVenta" class="btn btn-naranja fw-bold">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </main>
 
 <!-- Pie de página  -->
