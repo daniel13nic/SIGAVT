@@ -90,7 +90,7 @@ public class VentaWebController {
     }
 
 
-    @PostMapping("/guardar")
+    @PostMapping
     public String guardarVenta(@Valid @ModelAttribute("venta") Venta venta,
                                BindingResult result,
                                Model model,
@@ -99,16 +99,35 @@ public class VentaWebController {
         if (result.hasErrors()) {
             // Si hay error, se recarga todo el modelo
             cargarDatosModelo(model);
+
+            // Recargamos la tabla inferior
+            PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("idVenta").descending());
+            model.addAttribute("paginaVentas", ventaService.obtenerVentasPaginadasYFiltradas("hoy", null, null, pageRequest));
+            model.addAttribute("filtroFechaActual", "hoy");
+
             return "ventas/ventas";
         }
 
         try {
             ventaService.registrarVenta(venta);
-            redirectAttributes.addFlashAttribute("mensajeExito", "¡Venta registrada!.");
+            redirectAttributes.addFlashAttribute("mensajeExito", "¡Venta registrada!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", e.getMessage());
         }
 
         return "redirect:/ventas";
     }
+
+
+    @PostMapping("/anular")
+    public String anularVenta(@RequestParam("idVenta") Integer idVenta, RedirectAttributes redirectAttributes) {
+        try {
+            ventaService.anularVenta(idVenta);
+            redirectAttributes.addFlashAttribute("mensajeExito", "El ticket #" + idVenta + " ha sido anulado correctamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", e.getMessage());
+        }
+        return "redirect:/ventas";
+    }
+
 }

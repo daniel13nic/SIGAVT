@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -98,5 +100,21 @@ public class VentaService {
         return ventaRepository.buscarVentasConFiltros(fechaInicio, fechaFin, keywordClean, idCategoria, pageable);
     }
 
+
+
+    // Método auxiliar necesario para anular un ticket
+    public Venta obtenerVentaPorId(Integer idVenta) {
+        return ventaRepository.findById(idVenta)
+                .orElseThrow(() -> new EntityNotFoundException("El ticket con folio #" + idVenta + " no fue encontrado."));
+    }
+
+    public void anularVenta(Integer idVenta) {
+        Venta venta = obtenerVentaPorId(idVenta);
+        if (venta.getAnulada()) {
+            throw new IllegalStateException("El ticket ya se encuentra anulado.");
+        }
+        venta.setAnulada(true);
+        ventaRepository.save(venta);
+    }
 
 }

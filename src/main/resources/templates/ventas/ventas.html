@@ -95,7 +95,7 @@
                     <p class="text-secondary small mb-4">Selecciona el producto y la cantidad vendida.</p>
 
                     <!-- Formulario de Ventas -->
-                    <form id="formNuevaVenta" th:action="@{/ventas/guardar}" th:object="${venta}" method="POST">
+                    <form id="formNuevaVenta" th:action="@{/ventas}" th:object="${venta}" method="POST">
 
                         <!-- Alertas -->
                         <div th:if="${mensajeExito}" class="alert alert-success py-2 small fw-semibold" role="alert">
@@ -198,25 +198,33 @@
                             </thead>
 
                             <tbody>
-                            <tr th:each="v : ${paginaVentas.content}">
+
+                            <tr th:each="v : ${paginaVentas.content}" th:classappend="${v.anulada} ? 'bg-light text-muted' : ''">
                                 <td class="text-secondary" th:text="${v.idVenta}">1</td>
-                                <td class="fw-semibold text-uppercase" th:text="${v.producto.nombre}">PASTOR</td>
-
-
-                                <td th:text="${v.cantidad} + ' ' + ${v.producto.unidadMedida}">15.400 kg</td>
+                                <td class="fw-semibold text-uppercase" th:text="${v.producto.nombre}" th:classappend="${v.anulada} ? 'text-decoration-line-through' : ''">PASTOR</td>
+                                <td th:text="${v.cantidad} + ' ' + ${v.producto.unidadMedida}" th:classappend="${v.anulada} ? 'text-decoration-line-through' : ''">15.4 kg</td>
                                 <td class="text-secondary" th:text="${'$' + #numbers.formatDecimal(v.precioUnitario, 1, 'COMMA', 2, 'POINT')}">$150.00</td>
-                                <td class="fw-bold text-success" th:text="${'$' + #numbers.formatDecimal(v.totalVenta, 1, 'COMMA', 2, 'POINT')}">$2,310.00</td>
-                                <td class="text-secondary small" th:text="${v.usuario.username}">Daniel Nicolás</td>
-                                <td class="text-secondary small" th:text="${#temporals.format(v.fechaVenta, 'yyyy-MM-dd')}">2026-08-25</td>
 
+                                <!-- Si está anulada, el total se pone en cero visualmente y con una etiqueta -->
+                                <td class="fw-bold" th:classappend="${v.anulada} ? 'text-secondary' : 'text-success'">
+                                    <span th:if="${v.anulada}" class="badge bg-danger ms-1">ANULADO</span>
+                                    <span th:unless="${v.anulada}" th:text="${'$' + #numbers.formatDecimal(v.totalVenta, 1, 'COMMA', 2, 'POINT')}">$2,310.00</span>
+                                </td>
+
+                                <td class="text-secondary small" th:text="${v.usuario.username}">Usuario</td>
+                                <td class="text-secondary small" th:text="${#temporals.format(v.fechaVenta, 'yyyy-MM-dd')}">Fecha</td>
                                 <td class="text-center">
-                                    <!-- Botón de anular (borrado lógico) -->
-                                    <button class="btn btn-sm btn-light text-danger border" title="Anular ticket">
+                                    <!-- Botón que abre el modal. Solo se habilita si la venta no está anulada -->
+                                    <button type="button" class="btn btn-sm border"
+                                            th:classappend="${v.anulada} ? 'btn-light text-muted disabled' : 'btn-light text-danger'"
+                                            title="Anular ticket"
+                                            data-bs-toggle="modal" data-bs-target="#modalAnularVenta"
+                                            th:attr="onclick=|document.getElementById('inputIdAnular').value='${v.idVenta}'; document.getElementById('textoFolioAnular').innerText='${v.idVenta}';|">
                                         <i class="bi bi-x-circle"></i>
                                     </button>
                                 </td>
-
                             </tr>
+
                             </tbody>
 
                         </table>
@@ -272,6 +280,36 @@
                     <!-- SUBMIT del formulario -->
                     <button type="submit" form="formNuevaVenta" class="btn btn-naranja fw-bold">Confirmar</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal de Anulación de Venta -->
+    <div class="modal fade" id="modalAnularVenta" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">Anular Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form th:action="@{/ventas/anular}" method="POST">
+                    <div class="modal-body text-secondary">
+                        <input type="hidden" name="idVenta" id="inputIdAnular">
+
+                        <p>¿Estás completamente seguro de anular el folio <strong id="textoFolioAnular" class="text-dark"></strong>?</p>
+                        <div class="alert alert-danger py-2 small mb-0">
+                            <i class="bi bi-shield-lock-fill me-1"></i> Esta acción no eliminará el registro por motivos de auditoría, pero su valor se restará del total de ingresos del día. Esta acción es irreversible.
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold">Sí, anular ticket</button>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
