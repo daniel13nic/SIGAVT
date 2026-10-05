@@ -46,8 +46,8 @@ public interface VentaRepository extends JpaRepository<Venta, Integer> {
     @Query("SELECT AVG(v.totalVenta) FROM Venta v WHERE v.fechaVenta = :fecha AND v.anulada = false")
     BigDecimal promedioVentasPorFecha(@Param("fecha") LocalDate fecha);
 
-    // Agrupa por producto, suma las cantidades y devuelve el nombre del más vendido hoy
-    @Query(value = "SELECT p.nombre FROM venta v JOIN producto p ON v.id_producto = p.id_producto WHERE v.fecha_venta = :fecha AND v.anulada = false GROUP BY p.id_producto, p.nombre ORDER BY SUM(v.cantidad) DESC LIMIT 1", nativeQuery = true)
+    // Agrupa por producto, suma las cantidades y devuelve el nombre del producto que más vendió hoy
+    @Query(value = "SELECT p.nombre FROM venta v JOIN producto p ON v.id_producto = p.id_producto WHERE v.fecha_venta = :fecha AND v.anulada = false GROUP BY p.id_producto, p.nombre ORDER BY SUM(v.total_venta) DESC LIMIT 1", nativeQuery = true)
     String obtenerProductoTopDelDia(@Param("fecha") LocalDate fecha);
 
     // Filtra por fechas y opcionalmente por folio o nombre y categoría

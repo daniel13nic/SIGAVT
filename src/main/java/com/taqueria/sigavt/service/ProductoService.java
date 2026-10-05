@@ -7,6 +7,9 @@ import com.taqueria.sigavt.repository.ProveedorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -107,4 +110,11 @@ public class ProductoService {
     public long contarProductosActivos() {
         return productoRepository.countByActivoTrue();
     }
+
+
+    public Page<Producto> obtenerProductosPaginadosYFiltrados(String keyword, Integer idCategoria, Pageable pageable) {
+        String keywordClean = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        return productoRepository.buscarProductosConFiltros(keywordClean, idCategoria, pageable);
+    }
+
 }

@@ -17,7 +17,7 @@
 
     <div class="mb-4">
         <h2 class="fw-bold mb-0">Gestión de productos</h2>
-        <p class="text-secondary">Administra los productos, categorías, precios y su estado en el sistema.</p>
+        <p class="text-dark fw-medium" style="opacity: 0.85;">Administra los productos, categorías, precios y su estado en el sistema.</p>
     </div>
 
     <!-- Tarjetas de métricas del Catálogo  -->
@@ -80,10 +80,10 @@
             <div class="card shadow-sm border-0" style="border-radius: 12px;">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-1">Nuevo producto</h5>
-                    <p class="text-secondary small mb-4">Ingresa los detalles del artículo.</p>
+                    <p class="text-dark fw-medium small mb-4" style="opacity: 0.85;">Ingresa los detalles del artículo.</p>
 
 
-                    <form th:action="@{/productos/guardar}" th:object="${producto}" method="POST">
+                    <form th:action="@{/productos}" th:object="${producto}" method="POST">
                         <!-- Alerta de éxito -->
                         <div th:if="${mensajeExito}" class="alert alert-success py-2 small fw-semibold" role="alert">
                             <i class="bi bi-check-circle me-1"></i> <span th:text="${mensajeExito}"></span>
@@ -147,22 +147,29 @@
         <div class="col-lg-8">
             <div class="card shadow-sm border-0 h-100" style="border-radius: 12px;">
                 <div class="card-body p-4">
-
                     <div class="row g-2 mb-4">
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                                <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar producto por nombre o ID...">
+
+                        <!-- Formulario de Búsqueda y Filtros -->
+                        <form method="get" th:action="@{/productos}" id="formFiltros" class="row g-2 mb-4">
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                                    <input type="text" name="keyword" class="form-control border-start-0 ps-0"
+                                           placeholder="Buscar producto por nombre o ID..."
+                                           th:value="${keywordActual}">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <select class="form-select">
-                                <option>Todas las categorías</option>
-                                <option>Carnes</option>
-                                <option>Bebidas</option>
-                                <option>Complementos</option>
-                            </select>
-                        </div>
+                            <div class="col-md-4">
+                                <select name="idCategoria" class="form-select" onchange="document.getElementById('formFiltros').submit();">
+                                    <option value="">Todas las categorías</option>
+                                    <option th:each="cat : ${listaCategorias}"
+                                            th:value="${cat.idCategoria}"
+                                            th:text="${cat.nombre}"
+                                            th:selected="${idCategoriaActual == cat.idCategoria}"></option>
+                                </select>
+                            </div>
+                        </form>
+
                     </div>
 
                     <div class="table-responsive">
@@ -178,8 +185,9 @@
                                 <th class="text-center">Acciones</th>
                             </tr>
                             </thead>
+
                             <tbody>
-                            <tr th:each="prod : ${listaProductos}">
+                            <tr th:each="prod : ${paginaProductos.content}">
                                 <td class="text-secondary" th:text="${prod.idProducto}">001</td>
                                 <td class="fw-semibold" th:text="${prod.nombre}">Carne al Pastor</td>
                                 <td th:text="${prod.categoria.nombre}">Carnes</td>
@@ -192,30 +200,48 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-light text-secondary me-1" title="Editar"><i class="bi bi-pencil"></i></button>
+                                    <!-- Botón de Editar -->
+                                    <button type="button" class="btn btn-sm btn-light text-secondary border me-1"
+                                            data-bs-toggle="modal" data-bs-target="#modalEditarProducto"
+                                            title="Editar producto"
+                                            th:attr="onclick=|cargarDatosEdicion('${prod.idProducto}', '${prod.nombre}', '${prod.categoria.idCategoria}', '${prod.unidadMedida}', '${prod.precio}', ${prod.activo})|">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
 
-                                    <!-- Botón de borrado lógico -->
-                                    <a th:href="@{/productos/eliminar(idProducto=${prod.idProducto})}"
-                                       class="btn btn-sm btn-light text-danger"
-                                       title="Dar de baja"
-                                       onclick="return confirm('¿Estás seguro de dar de baja este producto? Ya no aparecerá en ventas.');">
+                                    <!-- Botón de Eliminar -->
+                                    <button type="button" class="btn btn-sm btn-light text-danger border"
+                                            data-bs-toggle="modal" data-bs-target="#modalEliminarProducto"
+                                            title="Dar de baja"
+                                            th:attr="onclick=|document.getElementById('inputIdEliminar').value='${prod.idProducto}'; document.getElementById('textoNombreEliminar').innerText='${prod.nombre}';|">
                                         <i class="bi bi-trash"></i>
-                                    </a>
+                                    </button>
                                 </td>
 
                             </tr>
                             </tbody>
+
+
                         </table>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                        <span class="text-secondary small">Mostrando 3 de 38 productos</span>
+                        <span class="text-secondary small" th:text="'Mostrando página ' + (${paginaProductos.number + 1}) + ' de ' + ${paginaProductos.totalPages} + ' (' + ${paginaProductos.totalElements} + ' productos)'">Mostrando...</span>
+
                         <nav>
                             <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
-                                <li class="page-item active"><a class="page-link" style="background-color: #e86c27; border-color: #e86c27;" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link text-secondary" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link text-secondary" href="#">Siguiente</a></li>
+                                <li class="page-item" th:classappend="${paginaProductos.first ? 'disabled' : ''}">
+                                    <a class="page-link text-secondary"
+                                       th:href="@{/productos(page=${paginaProductos.number - 1}, keyword=${keywordActual}, idCategoria=${idCategoriaActual})}">Anterior</a>
+                                </li>
+
+                                <li class="page-item active">
+                                    <span class="page-link" style="background-color: #e86c27; border-color: #e86c27;" th:text="${paginaProductos.number + 1}">1</span>
+                                </li>
+
+                                <li class="page-item" th:classappend="${paginaProductos.last ? 'disabled' : ''}">
+                                    <a class="page-link text-secondary"
+                                       th:href="@{/productos(page=${paginaProductos.number + 1}, keyword=${keywordActual}, idCategoria=${idCategoriaActual})}">Siguiente</a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
@@ -225,6 +251,102 @@
         </div>
 
     </div>
+
+    <!-- Eliminación (baja lógica) -->
+    <div class="modal fade" id="modalEliminarProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">Confirmar Baja</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/productos/eliminar}" method="POST">
+                    <div class="modal-body text-secondary">
+                        <input type="hidden" name="idProducto" id="inputIdEliminar">
+                        <p>¿Estás seguro de desactivar el producto <strong id="textoNombreEliminar" class="text-dark"></strong>?</p>
+                        <div class="alert alert-warning py-2 small mb-0">
+                            <i class="bi bi-info-circle-fill me-1"></i> El producto ya no aparecerá en el punto de venta, pero su historial de ventas se mantendrá intacto para los reportes.
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-bold">Sí, dar de baja</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edición -->
+    <div class="modal fade" id="modalEditarProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 12px; border: none;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold">Editar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/productos}" method="POST">
+                    <div class="modal-body text-secondary">
+                        <input type="hidden" name="idProducto" id="editIdProducto">
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-dark">Nombre del producto</label>
+                            <input type="text" name="nombre" id="editNombre" class="form-control" required>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Categoría</label>
+                                <select name="categoria" id="editCategoria" class="form-select" required>
+                                    <option th:each="cat : ${listaCategorias}" th:value="${cat.idCategoria}" th:text="${cat.nombre}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">U. Medida</label>
+                                <select name="unidadMedida" id="editUnidad" class="form-select" required>
+                                    <option value="kg">Kilogramo (kg)</option>
+                                    <option value="pza">Pieza (pza)</option>
+                                    <option value="L">Litro (L)</option>
+                                    <option value="orden">Orden</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Precio Unitario ($)</label>
+                                <input type="number" step="0.01" name="precio" id="editPrecio" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Estado</label>
+                                <select name="activo" id="editActivo" class="form-select" required>
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0 mt-2">
+                        <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-naranja fw-bold">Actualizar Producto</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cargarDatosEdicion(id, nombre, idCategoria, unidadMedida, precio, activo) {
+            document.getElementById('editIdProducto').value = id;
+            document.getElementById('editNombre').value = nombre;
+            document.getElementById('editCategoria').value = idCategoria;
+            document.getElementById('editUnidad').value = unidadMedida;
+            document.getElementById('editPrecio').value = precio;
+            document.getElementById('editActivo').value = activo.toString();
+        }
+    </script>
+
+
 </main>
 
 <!-- Pie de página inyectado -->
