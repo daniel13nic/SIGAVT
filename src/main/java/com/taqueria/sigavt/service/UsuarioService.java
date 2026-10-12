@@ -2,6 +2,7 @@ package com.taqueria.sigavt.service;
 
 import com.taqueria.sigavt.model.Usuario;
 import com.taqueria.sigavt.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,9 +19,14 @@ import java.util.Map;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Obtener todos los usuarios (para el panel del Administrador)
@@ -38,22 +44,19 @@ public class UsuarioService {
         return usuarioRepository.findByUsername(username);
     }
 
-    // Crear o actualizar un usuario
+    // Crear o actualizar un usuario de forma segura
     public Usuario guardarUsuario(Usuario usuario) {
-        // contraseña plana
-        // se encriptaría con BCryptPasswordEncoder antes de mandarla a la BD.
+        if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
+            if (!usuario.getPassword().startsWith("$2a$")) {
+                String hashSeguro = passwordEncoder.encode(usuario.getPassword());
+                usuario.setPassword(hashSeguro);
+            }
+        }
         return usuarioRepository.save(usuario);
     }
 
     // Eliminar un usuario
     public void eliminarUsuario(Integer idUsuario) {
-        /*
-         * NOTA:
-         * Si un Operador ya registró ventas en la base de datos, intentar borrarlo
-         * con este método arrojará un error de llave foránea (para proteger el historial
-         * de la taquería). Se agregaría un campo 'activo' a la tabla Usuario para hacer
-         * una baja lógica, como con Producto.
-         */
         usuarioRepository.deleteById(idUsuario);
     }
 
@@ -76,6 +79,7 @@ public class UsuarioService {
         long totalConsultores = listaUsuarios.stream()
                 .filter(u -> u.getPerfil() != null && u.getPerfil().getNombre().toLowerCase().contains("consultor"))
                 .count();
+
 
         metricas.put("totalUsuarios", totalUsuarios);
         metricas.put("totalAdmins", totalAdmins);

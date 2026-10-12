@@ -43,7 +43,7 @@ public class ProductoService {
             producto.setNombre(producto.getNombre().trim().toUpperCase());
         }
 
-        if (producto.getIdProducto() == null) {
+        if (producto.getActivo() == null) {
             producto.setActivo(true);
         }
         return productoRepository.save(producto);

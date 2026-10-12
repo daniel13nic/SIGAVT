@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import java.time.LocalDate;
 
 @Controller
@@ -38,4 +41,16 @@ public class InicioWebController {
 
         return "inicio";
     }
+
+
+    @GetMapping("/login")
+    public String mostrarLogin() {
+        return "login";
+    }
+
+    @GetMapping("/403")
+    public String accesoDenegado() {
+        return "403";
+    }
+
 }
