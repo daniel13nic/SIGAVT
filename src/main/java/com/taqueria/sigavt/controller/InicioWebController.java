@@ -30,7 +30,7 @@ public class InicioWebController {
     public String mostrarInicio(Model model) {
         LocalDate hoy = LocalDate.now();
 
-        model.addAttribute("nombreUsuario", "Daniel Nicolás");
+        // model.addAttribute("nombreUsuario", "Daniel Nicolás");
         model.addAttribute("fechaActual", hoy);
 
         // Datos para las tarjetas (las métricas)

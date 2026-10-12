@@ -1,5 +1,6 @@
 package com.taqueria.sigavt.controller;
 
+import com.taqueria.sigavt.model.Usuario;
 import com.taqueria.sigavt.model.Venta;
 import com.taqueria.sigavt.repository.CategoriaRepository;
 import com.taqueria.sigavt.repository.UsuarioRepository;
@@ -13,11 +14,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 
@@ -41,22 +42,17 @@ public class VentaWebController {
         this.categoriaRepository = categoriaRepository;
     }
 
-
     private void cargarDatosModelo(Model model) {
         model.addAttribute("listaProductos", productoService.obtenerActivos());
-        model.addAttribute("listaUsuarios", usuarioRepository.findAll());
-
         model.addAttribute("listaCategorias", categoriaRepository.findAll());
+
 
         LocalDate hoy = LocalDate.now();
         model.addAttribute("registrosHoy", ventaService.contarVentasDelDia(hoy));
         model.addAttribute("totalVendido", ventaService.obtenerIngresosDelDia(hoy));
         model.addAttribute("ventaPromedio", ventaService.obtenerTicketPromedioDelDia(hoy));
         model.addAttribute("productoTop", ventaService.obtenerProductoTopDelDia(hoy));
-
-        // model.addAttribute("listaVentas", ventaRepository.findAll());
     }
-
 
     @GetMapping
     public String mostrarVentas(
@@ -72,16 +68,10 @@ public class VentaWebController {
 
         cargarDatosModelo(model);
 
-
-        // petición de paginación (página actual, 10 registros, orden descendente)
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by("idVenta").descending());
-
-        // Ejecuta la consulta paginada
         Page<Venta> paginaVentas = ventaService.obtenerVentasPaginadasYFiltradas(filtroFecha, keyword, idCategoria, pageRequest);
 
-
         model.addAttribute("paginaVentas", paginaVentas);
-
         model.addAttribute("filtroFechaActual", filtroFecha);
         model.addAttribute("keywordActual", keyword);
         model.addAttribute("idCategoriaActual", idCategoria);
@@ -89,22 +79,26 @@ public class VentaWebController {
         return "ventas/ventas";
     }
 
-
     @PostMapping
     public String guardarVenta(@Valid @ModelAttribute("venta") Venta venta,
                                BindingResult result,
                                Model model,
                                RedirectAttributes redirectAttributes) {
 
-        if (result.hasErrors()) {
-            // Si hay error, se recarga todo el modelo
-            cargarDatosModelo(model);
+        // Se extrae el usuario autenticado desde el contexto de seguridad
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String usernameActual = auth.getName();
 
-            // Recargamos la tabla inferior
+        // Se busca la entidad real en la base de datos y se la asignamos a la venta
+        Usuario usuarioLogueado = usuarioRepository.findByUsername(usernameActual)
+                .orElseThrow(() -> new RuntimeException("Error crítico: Usuario no encontrado"));
+        venta.setUsuario(usuarioLogueado);
+
+        if (result.hasErrors() && result.getFieldErrorCount() > result.getFieldErrorCount("usuario")) {
+            cargarDatosModelo(model);
             PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("idVenta").descending());
             model.addAttribute("paginaVentas", ventaService.obtenerVentasPaginadasYFiltradas("hoy", null, null, pageRequest));
             model.addAttribute("filtroFechaActual", "hoy");
-
             return "ventas/ventas";
         }
 
@@ -118,7 +112,6 @@ public class VentaWebController {
         return "redirect:/ventas";
     }
 
-
     @PostMapping("/anular")
     public String anularVenta(@RequestParam("idVenta") Integer idVenta, RedirectAttributes redirectAttributes) {
         try {
@@ -129,5 +122,4 @@ public class VentaWebController {
         }
         return "redirect:/ventas";
     }
-
 }

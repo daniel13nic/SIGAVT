@@ -140,14 +140,13 @@
                                        th:classappend="${#fields.hasErrors('cantidad')} ? 'is-invalid' : ''">
                                 <div th:if="${#fields.hasErrors('cantidad')}" th:errors="*{cantidad}" class="invalid-feedback small"></div>
                             </div>
+
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Usuario (Atiende)</label>
-                                <select class="form-select" th:field="*{usuario}" th:classappend="${#fields.hasErrors('usuario')} ? 'is-invalid' : ''">
-                                    <option value="" disabled selected>Seleccionar...</option>
-                                    <option th:each="user : ${listaUsuarios}" th:value="${user.idUsuario}" th:text="${user.nombre}"></option>
-                                </select>
-                                <div th:if="${#fields.hasErrors('usuario')}" th:errors="*{usuario}" class="invalid-feedback small"></div>
+                                <label class="form-label">Usuario (Atiende)</label>
+                                <!-- nombre del usuario logueado -->
+                                <input type="text" class="form-control bg-light" th:value="${#authentication.name}" readonly>
                             </div>
+
                         </div>
 
                         <button type="button" class="btn btn-naranja w-100 py-2 fw-bold mt-4" data-bs-toggle="modal" data-bs-target="#modalConfirmarVenta">

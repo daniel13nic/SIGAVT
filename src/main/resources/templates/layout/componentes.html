@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Componentes Base</title>
@@ -22,22 +23,34 @@
         <div class="collapse navbar-collapse" id="navbarNav">
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
+                <!-- Visibles para TODOS (Operador y Administrador) -->
                 <li class="nav-item me-3"><a class="nav-link" th:href="@{/}">Inicio</a></li>
                 <li class="nav-item me-3"><a class="nav-link" th:href="@{/ventas}">Ventas</a></li>
-                <li class="nav-item me-3"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
-                <li class="nav-item me-3"><a class="nav-link" th:href="@{/proveedores}">Proveedores</a></li>
-                <li class="nav-item me-3"><a class="nav-link" th:href="@{/reportes}">Reportes</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/usuarios}">Usuarios</a></li>
+
+                <!-- Visibles SOLO para el rol ADMINISTRADOR -->
+                <li class="nav-item me-3" sec:authorize="hasRole('ADMINISTRADOR')"><a class="nav-link" th:href="@{/productos}">Productos</a></li>
+                <li class="nav-item me-3" sec:authorize="hasRole('ADMINISTRADOR')"><a class="nav-link" th:href="@{/proveedores}">Proveedores</a></li>
+                <li class="nav-item me-3" sec:authorize="hasRole('ADMINISTRADOR')"><a class="nav-link" th:href="@{/reportes}">Reportes</a></li>
+                <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')"><a class="nav-link" th:href="@{/usuarios}">Usuarios</a></li>
             </ul>
 
-            <!-- Perfil de usuario -->
-            <div class="d-flex align-items-center text-white">
-                <div class="rounded-circle d-flex justify-content-center align-items-center me-2 shadow-sm"
-                     style="width: 35px; height: 35px; background-color: #e86c27; font-size: 0.85rem; font-weight: bold;">
-                    Us
+
+            <!-- Perfil de usuario y Logout -->
+            <div class="d-flex align-items-center">
+                <div class="badge rounded-pill border border-secondary d-flex align-items-center me-3 px-3 py-2"
+                     style="background-color: rgba(255,255,255,0.05);">
+                    <i class="bi bi-person-fill text-naranja me-2 fs-5"></i>
+                    <span class="fs-6 fw-normal text-light" sec:authentication="name">Usuario</span>
                 </div>
-                <span class="fs-6">Usuario</span>
+
+                <!-- Botón de Cerrar sesión -->
+                <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                    <button type="submit" class="btn btn-sm btn-naranja rounded-pill px-3 py-1 fw-semibold">
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
+
         </div>
     </div>
 </nav>

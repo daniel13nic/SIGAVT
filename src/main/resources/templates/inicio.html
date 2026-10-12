@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,7 @@
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
     <link rel="stylesheet" th:href="@{/css/estilos.css}">
-
-
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -24,7 +22,7 @@
 
     <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-1">
-        <h2 class="fw-bold mb-0" th:text="'Bienvenido, ' + ${nombreUsuario}">Bienvenido a SIGAVT</h2>
+        <h2 class="fw-bold mb-0">Bienvenido, <span sec:authentication="name" style="color: #e86c27;">Usuario</span></h2>
         <a th:href="@{/ventas}" class="btn btn-naranja px-4 py-2 fw-bold shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Nueva venta
         </a>
@@ -40,26 +38,23 @@
         <p class="text-dark fw-medium" style="opacity: 0.85;">Por favor, seleccione una opción en el menú superior o en los ACCESOS RÁPIDOS para comenzar a operar.</p>
     </div>
 
-
     <!-- Fila de tarjetas de datos -->
     <div class="row g-4 mb-5">
 
-        <!-- Ventas de hoy -->
+        <!-- Ventas de hoy (Visible para todos) -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3"><i class="bi bi-cash-stack"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Ventas de hoy</p>
-                        <!-- Formatea a moneda: ej. $4,285.00 -->
                         <h3 class="fw-bold mb-0" th:text="${'$' + #numbers.formatDecimal(ventasHoy, 1, 'COMMA', 2, 'POINT')}">$0.00</h3>
-                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 12% vs ayer</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Productos activos -->
+        <!-- Productos activos  -->
         <div class="col-md-3">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
@@ -67,37 +62,32 @@
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Productos activos</p>
                         <h3 class="fw-bold mb-0" th:text="${productosActivos}">0</h3>
-                        <small class="text-success fw-bold"><i class="bi bi-check2-circle"></i> Catálogo al día</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Proveedores -->
-        <div class="col-md-3">
+        <!-- Proveedores (Solo visible para Administrador) -->
+        <div class="col-md-3" sec:authorize="hasRole('ADMINISTRADOR')">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3"><i class="bi bi-truck"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Proveedores</p>
                         <h3 class="fw-bold mb-0" th:text="${totalProveedores}">0</h3>
-                        <small class="text-success fw-bold"><i class="bi bi-check2-circle"></i> Suministro activo</small>
                     </div>
                 </div>
             </div>
         </div>
 
-
-
-        <!-- Usuarios -->
-        <div class="col-md-3">
+        <!-- Usuarios (Solo visible para Administrador) -->
+        <div class="col-md-3" sec:authorize="hasRole('ADMINISTRADOR')">
             <div class="card tarjeta-metrica h-100 p-3">
                 <div class="d-flex align-items-center">
                     <div class="icono-metrica me-3"><i class="bi bi-people"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Usuarios activos</p>
                         <h3 class="fw-bold mb-0">5</h3>
-                        <small class="text-success fw-bold">Todos conectados</small>
                     </div>
                 </div>
             </div>
@@ -105,13 +95,11 @@
 
     </div>
 
-
-
     <!-- Sección de accesos rápidos -->
     <h6 class="text-uppercase text-secondary fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem;">Accesos Rápidos</h6>
     <div class="row g-4 mb-4">
 
-        <!-- Acceso: Ventas -->
+        <!-- Acceso: Ventas (Visible para todos) -->
         <div class="col-md-3">
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-wallet2"></i></div>
@@ -121,8 +109,8 @@
             </div>
         </div>
 
-        <!-- Acceso: Productos -->
-        <div class="col-md-3">
+        <!-- Acceso: Productos (Solo visible para Administrador) -->
+        <div class="col-md-3" sec:authorize="hasRole('ADMINISTRADOR')">
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-box"></i></div>
                 <h5 class="fw-bold">Productos</h5>
@@ -131,9 +119,8 @@
             </div>
         </div>
 
-
-        <!-- Proveedores -->
-        <div class="col-md-3">
+        <!-- Proveedores (Solo visible para Administrador) -->
+        <div class="col-md-3" sec:authorize="hasRole('ADMINISTRADOR')">
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-truck"></i></div>
                 <h5 class="fw-bold">Proveedores</h5>
@@ -142,8 +129,8 @@
             </div>
         </div>
 
-        <!-- Acceso: Reportes -->
-        <div class="col-md-3">
+        <!-- Acceso: Reportes (Solo visible para Administrador) -->
+        <div class="col-md-3" sec:authorize="hasRole('ADMINISTRADOR')">
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-bar-chart-line"></i></div>
                 <h5 class="fw-bold">Reportes</h5>
@@ -152,8 +139,8 @@
             </div>
         </div>
 
-        <!-- Acceso: Usuarios -->
-        <div class="col-md-3">
+        <!-- Acceso: Usuarios (Solo visible para Administrador) -->
+        <div class="col-md-3" sec:authorize="hasRole('ADMINISTRADOR')">
             <div class="card tarjeta-acceso p-4">
                 <div class="icono-metrica mb-3"><i class="bi bi-person-gear"></i></div>
                 <h5 class="fw-bold">Usuarios</h5>
@@ -161,8 +148,6 @@
                 <a th:href="@{/usuarios}" class="text-naranja fw-bold text-decoration-none mt-auto">Ir a Usuarios &rarr;</a>
             </div>
         </div>
-
-
 
     </div>
 </main>
