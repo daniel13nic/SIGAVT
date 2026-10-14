@@ -27,4 +27,9 @@ public class Proveedor {
     @ManyToMany(mappedBy = "proveedores")
     @JsonIgnore
     private List<Producto> productos;
+
+
+    @Transient
+    private List<Integer> productosIds;
+
 }
