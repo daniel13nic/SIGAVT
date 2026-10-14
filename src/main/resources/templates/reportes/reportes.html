@@ -15,105 +15,113 @@
 
 <main class="container-fluid px-5 my-4 flex-grow-1" style="max-width: 1400px;">
 
-    <!-- Encabezado y Botones de Exportación -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Encabezado de Reportes -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
-            <h2 class="fw-bold mb-0">Reportes</h2>
-            <p class="text-secondary">Analiza el desempeño de ventas por periodo, categoría y usuario</p>
+            <h2 class="fw-bold mb-1 text-dark">Reportes</h2>
+            <p class="text-dark fw-medium mb-0" style="opacity: 0.85;">
+                Analiza el desempeño de ventas por periodo, categoría y usuario.
+            </p>
         </div>
+
         <div>
-            <button class="btn btn-outline-naranja me-2 bg-white fw-semibold">
+            <a th:href="@{/reportes/exportar/pdf(desde=${fechaDesde}, hasta=${fechaHasta}, idCategoria=${idCategoriaSeleccionada})}"
+               class="btn btn-outline-naranja me-2 fw-semibold shadow-sm">
                 <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-            </button>
-            <button class="btn btn-outline-naranja bg-white fw-semibold">
+            </a>
+
+            <a th:href="@{/reportes/exportar/excel(desde=${fechaDesde}, hasta=${fechaHasta}, idCategoria=${idCategoriaSeleccionada})}"
+               class="btn btn-outline-naranja fw-semibold shadow-sm">
                 <i class="bi bi-file-earmark-excel"></i> Exportar Excel
-            </button>
+            </a>
         </div>
     </div>
 
+
     <!-- Barra de Filtros (Ventas por periodo) -->
     <div class="tarjeta-filtro p-4 mb-4">
-        <form class="row g-3 align-items-end">
-            <div class="col-md-2">
+        <form th:action="@{/reportes}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
                 <label class="form-label small fw-semibold">Desde</label>
-                <input type="date" class="form-control" value="2026-08-06">
+                <input type="date" name="desde" class="form-control" th:value="${fechaDesde}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label small fw-semibold">Hasta</label>
-                <input type="date" class="form-control" value="2026-08-12">
+                <input type="date" name="hasta" class="form-control" th:value="${fechaHasta}">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label class="form-label small fw-semibold">Categoría</label>
-                <select class="form-select">
-                    <option>Todas las categorías</option>
-                    <option>Carnes</option>
-                    <option>Bebidas</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small fw-semibold">Usuario</label>
-                <select class="form-select">
-                    <option>Todos los usuarios</option>
-                    <option>Daniel N.</option>
-                    <option>Areli G.</option>
+                <select name="idCategoria" class="form-select">
+                    <option value="">Todas las categorías</option>
+                    <option th:each="cat : ${listaCategorias}" th:value="${cat.idCategoria}" th:text="${cat.nombre}" th:selected="${idCategoriaSeleccionada == cat.idCategoria}"></option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="button" class="btn btn-naranja w-100 fw-bold">
+                <button type="submit" class="btn btn-naranja w-100 fw-bold">
                     <i class="bi bi-funnel"></i> Aplicar filtros
                 </button>
             </div>
         </form>
     </div>
 
+
+
     <!-- Fila de Tarjetas de Métricas -->
     <div class="row g-4 mb-4">
+        <!-- Total vendido -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #e86c27;">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3"><i class="bi bi-cash"></i></div>
+                    <div class="icono-metrica me-3" style="color: #e86c27; background-color: rgba(232, 108, 39, 0.1);"><i class="bi bi-cash"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Total vendido</p>
-                        <h4 class="fw-bold mb-0">$16,780</h4>
-                        <small class="text-success fw-bold"><i class="bi bi-arrow-up-short"></i> 9% vs semana anterior</small>
+                        <h4 class="fw-bold mb-0 text-dark" th:text="${'$' + #numbers.formatDecimal(metricas.totalVendido, 1, 'COMMA', 2, 'POINT')}">$0.00</h4>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Ventas registradas -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3 border-left-secondary" style="border-left-color: #6c757d;">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #e86c27;">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108,117,125,0.1);"><i class="bi bi-receipt"></i></div>
+                    <div class="icono-metrica me-3" style="color: #e86c27; background-color: rgba(232, 108, 39, 0.1);"><i class="bi bi-receipt"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Ventas registradas</p>
-                        <h4 class="fw-bold mb-0">212</h4>
+                        <h4 class="fw-bold mb-0 text-dark" th:text="${metricas.ventasRegistradas}">0</h4>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Venta promedio -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3 border-left-secondary" style="border-left-color: #6c757d;">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #dc3545;">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108,117,125,0.1);"><i class="bi bi-graph-up"></i></div>
+                    <!-- Color rojo para el promedio -->
+                    <div class="icono-metrica me-3" style="color: #dc3545; background-color: rgba(220, 53, 69, 0.1);"><i class="bi bi-graph-up"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Venta promedio</p>
-                        <h4 class="fw-bold mb-0">$79</h4>
+                        <h4 class="fw-bold mb-0 text-dark" th:text="${'$' + #numbers.formatDecimal(metricas.ventaPromedio, 1, 'COMMA', 2, 'POINT')}">$0.00</h4>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Categoría top -->
         <div class="col-md-3">
-            <div class="card tarjeta-metrica h-100 p-3 border-left-secondary" style="border-left-color: #6c757d;">
+            <div class="card tarjeta-metrica h-100 p-3" style="border-left-color: #2A63D1;">
                 <div class="d-flex align-items-center">
-                    <div class="icono-metrica me-3" style="color: #6c757d; background-color: rgba(108,117,125,0.1);"><i class="bi bi-award"></i></div>
+                    <div class="icono-metrica me-3" style="color: #2A63D1; background-color: rgba(25, 135, 84, 0.1);"><i class="bi bi-award"></i></div>
                     <div>
                         <p class="text-secondary mb-0 small fw-semibold">Categoría top</p>
-                        <h4 class="fw-bold mb-0">Carnes</h4>
+                        <h4 class="fw-bold mb-0 text-dark" th:text="${metricas.categoriaTop}">N/A</h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Sección de Gráficas -->
     <div class="row g-4 mb-4">
@@ -123,52 +131,13 @@
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h6 class="fw-bold mb-0">Ventas por día</h6>
-                        <span class="text-secondary small">6 - 12 de agosto</span>
+                        <!-- Muestra el rango de fechas dinámicamente -->
+                        <span class="text-secondary small" th:text="${#temporals.format(fechaDesde, 'd MMM')} + ' - ' + ${#temporals.format(fechaHasta, 'd MMM')}">Rango de fechas</span>
                     </div>
 
-                    <div class="contenedor-barras">
-                        <!-- Lun -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$2,100</span>
-                            <div class="barra-grafico" style="height: 65%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Lun</span>
-                        </div>
-                        <!-- Mar -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$1,800</span>
-                            <div class="barra-grafico" style="height: 55%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Mar</span>
-                        </div>
-                        <!-- Mie -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$2,400</span>
-                            <div class="barra-grafico" style="height: 75%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Mié</span>
-                        </div>
-                        <!-- Jue -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$1,950</span>
-                            <div class="barra-grafico" style="height: 60%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Jue</span>
-                        </div>
-                        <!-- Vie -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$2,650</span>
-                            <div class="barra-grafico" style="height: 82%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Vie</span>
-                        </div>
-                        <!-- Sab -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$3,100</span>
-                            <div class="barra-grafico" style="height: 100%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Sáb</span>
-                        </div>
-                        <!-- Dom -->
-                        <div class="columna-barra">
-                            <span class="small fw-semibold mb-1 text-secondary">$2,140</span>
-                            <div class="barra-grafico" style="height: 66%;"></div>
-                            <span class="small mt-2 text-muted fw-semibold">Dom</span>
-                        </div>
+                    <!-- Contenedor del Canvas para Chart.js -->
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="graficaBarras"></canvas>
                     </div>
                 </div>
             </div>
@@ -180,39 +149,14 @@
                 <div class="card-body p-4">
                     <h6 class="fw-bold mb-4">Ventas por categoría</h6>
 
-                    <div class="d-flex align-items-center justify-content-between">
-                        <!-- Dona CSS -->
-                        <div class="grafico-dona shadow-sm">
-                            <div class="centro-dona">
-                                <h5 class="fw-bold mb-0">$16.8k</h5>
-                                <span class="small text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Total</span>
-                            </div>
-                        </div>
-
-                        <!-- Leyenda -->
-                        <div class="ms-4 w-100">
-                            <div class="d-flex justify-content-between mb-2 small">
-                                <span><i class="bi bi-square-fill text-naranja me-2"></i>Carnes</span>
-                                <span class="fw-bold">52%</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 small">
-                                <span><i class="bi bi-square-fill me-2" style="color: #f4a261;"></i>Bebidas</span>
-                                <span class="fw-bold">23%</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2 small">
-                                <span><i class="bi bi-square-fill me-2" style="color: #e9c46a;"></i>Complementos</span>
-                                <span class="fw-bold">18%</span>
-                            </div>
-                            <div class="d-flex justify-content-between small">
-                                <span><i class="bi bi-square-fill me-2" style="color: #adb5bd;"></i>Postres</span>
-                                <span class="fw-bold">7%</span>
-                            </div>
-                        </div>
+                    <div style="height: 250px; position: relative;">
+                        <canvas id="graficaDona"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Filas de Tops -->
     <div class="row g-4 mb-4">
@@ -222,23 +166,19 @@
                 <div class="card-body p-4">
                     <h6 class="fw-bold mb-4">Top productos</h6>
 
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="fw-semibold small">Carne al Pastor <span class="text-muted fw-normal">(20 kg vendidos)</span></span>
-                            <span class="fw-bold small">$3,600</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar progreso-naranja" style="width: 85%;"></div>
-                        </div>
-                    </div>
+                    <!-- Mensaje si no hay datos en el periodo -->
+                    <p th:if="${#lists.isEmpty(rankingProductos)}" class="text-muted small">No hay ventas registradas en este periodo.</p>
 
-                    <div>
+                    <div class="mb-4" th:each="prod : ${rankingProductos}">
                         <div class="d-flex justify-content-between mb-1">
-                            <span class="fw-semibold small">Bistec <span class="text-muted fw-normal">(14 kg vendidos)</span></span>
-                            <span class="fw-bold small">$2,800</span>
+                            <span class="fw-semibold small" th:text="${prod[0]}">Nombre Producto</span>
+                            <span class="text-muted fw-normal ms-1" style="font-size: 0.8rem;" th:text="'(' + ${#numbers.formatDecimal(prod[1], 1, 'COMMA', 2, 'POINT')} + ' vendidos)'">(0 vendidos)</span>
+                            <span class="fw-bold small ms-auto" th:text="${'$' + #numbers.formatDecimal(prod[2], 1, 'COMMA', 2, 'POINT')}">$0.00</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar progreso-naranja" style="width: 65%;"></div>
+                            <div class="progress-bar"
+                                 th:style="|width: ${(prod[2].doubleValue() * 100.0) / rankingProductos[0][2].doubleValue()}%; background-color: #2A63D1;|">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -251,34 +191,147 @@
                 <div class="card-body p-4">
                     <h6 class="fw-bold mb-4">Ventas por usuario</h6>
 
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="fw-semibold small">Daniel N. <span class="text-muted fw-normal">(34 ventas registradas)</span></span>
-                            <span class="fw-bold small">$5,120</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar progreso-naranja" style="width: 75%;"></div>
-                        </div>
-                    </div>
+                    <!-- Mensaje si no hay datos en el periodo -->
+                    <p th:if="${#lists.isEmpty(rankingUsuarios)}" class="text-muted small">No hay ventas registradas en este periodo.</p>
 
-                    <div>
+                    <div class="mb-4" th:each="usr : ${rankingUsuarios}">
                         <div class="d-flex justify-content-between mb-1">
-                            <span class="fw-semibold small">Areli G. <span class="text-muted fw-normal">(21 ventas registradas)</span></span>
-                            <span class="fw-bold small">$3,050</span>
+                            <span class="fw-semibold small" th:text="${usr[0]}">Nombre Usuario</span>
+                            <span class="text-muted fw-normal ms-1" style="font-size: 0.8rem;" th:text="'(' + ${usr[1]} + ' ventas registradas)'">(0 ventas registradas)</span>
+                            <span class="fw-bold small ms-auto" th:text="${'$' + #numbers.formatDecimal(usr[2], 1, 'COMMA', 2, 'POINT')}">$0.00</span>
                         </div>
                         <div class="progress" style="height: 6px;">
-                            <div class="progress-bar progreso-naranja" style="width: 45%;"></div>
+                            <div class="progress-bar"
+                                 th:style="|width: ${(usr[2].doubleValue() * 100.0) / rankingUsuarios[0][2].doubleValue()}%; background-color: #50AB8A;|">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
+
 </main>
 
 <!-- Pie de página inyectado -->
 <div th:replace="~{layout/componentes :: pie-pagina}"></div>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- Script de inicialización de Chart.js -->
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const barrasLabelsRaw = /*[[${datosBarras.labels}]]*/ [];
+        const barrasData = /*[[${datosBarras.data}]]*/ [];
+
+        const donaLabels = /*[[${datosDona.labels}]]*/ [];
+        const donaData = /*[[${datosDona.data}]]*/ [];
+
+        const barrasLabels = barrasLabelsRaw.map(fechaString => {
+            const fecha = new Date(fechaString + 'T00:00:00');
+            return fecha.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+        });
+
+        const pluginCentroDona = {
+            id: 'pluginCentroDona',
+            beforeDraw(chart) {
+                const { ctx, data } = chart;
+                if (data.datasets[0].data.length === 0) return; // Si no hay datos, no dibuja nada
+
+                ctx.save();
+                // Obtenemos el centro exacto del anillo dibujado
+                const x = chart.getDatasetMeta(0).data[0].x;
+                const y = chart.getDatasetMeta(0).data[0].y;
+
+                // Calculamos el total
+                const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Dibujar el total ($16,780.00)
+                ctx.font = 'bold 1.1rem sans-serif';
+                ctx.fillStyle = '#212529'; // text-dark
+                ctx.fillText(formatoMoneda.format(total), x, y - 8);
+
+                // Dibujar la palabra TOTAL
+                ctx.font = '600 0.7rem sans-serif';
+                ctx.fillStyle = '#6c757d'; // text-muted
+                ctx.fillText('TOTAL', x, y + 12);
+
+                ctx.restore();
+            }
+        };
+
+        /* 3. Configuración de Gráfica de Barras */
+        const ctxBarras = document.getElementById('graficaBarras').getContext('2d');
+        new Chart(ctxBarras, {
+            type: 'bar',
+            data: {
+                labels: barrasLabels,
+                datasets: [{
+                    label: 'Ingresos ($)',
+                    data: barrasData,
+                    backgroundColor: '#e86c27',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        /* Configuración de Gráfica de Dona */
+        const ctxDona = document.getElementById('graficaDona').getContext('2d');
+        new Chart(ctxDona, {
+            type: 'doughnut',
+            data: {
+                labels: donaLabels,
+                datasets: [{
+                    data: donaData,
+                    // Paleta cálida y vibrante
+                    backgroundColor: [
+                        '#e86c27', // Naranja principal
+                        '#f4a261', // Naranja claro
+                        '#e9c46a', // Amarillo mostaza
+                        '#2a9d8f', // Verde agua
+                        '#adb5bd'  // Gris claro
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } }
+                    }
+                }
+            },
+            plugins: [pluginCentroDona]
+        });
+    });
+</script>
+
+
 </body>
 </html>

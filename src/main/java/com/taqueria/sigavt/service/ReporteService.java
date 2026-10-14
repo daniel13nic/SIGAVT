@@ -1,15 +1,14 @@
 package com.taqueria.sigavt.service;
 
-import com.taqueria.sigavt.model.Venta;
 import com.taqueria.sigavt.repository.VentaRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,63 +21,59 @@ public class ReporteService {
         this.ventaRepository = ventaRepository;
     }
 
-    // Ventas por día
-    public List<Venta> obtenerVentasPorDia(LocalDate fecha) {
-        return ventaRepository.findByFechaVenta(fecha);
-    }
-
-    // Ventas por periodo
-    public List<Venta> obtenerVentasPorPeriodo(LocalDate fechaInicio, LocalDate fechaFin) {
-        if (fechaInicio.isAfter(fechaFin)) {
-            throw new IllegalArgumentException("Error: La fecha de inicio no puede ser posterior a la fecha final.");
-        }
-        return ventaRepository.findByFechaVentaBetween(fechaInicio, fechaFin);
-    }
-
-    // Productos más vendidos
-    // Retorna una lista de arreglos donde [0] es el nombre del producto y [1] es la cantidad total
-    public List<Object[]> obtenerProductosMasVendidos() {
-        return ventaRepository.findProductosMasVendidos();
-    }
 
 
+    // MÉTRICAS SUPERIORES DEL DASHBOARD
 
-    public Map<String, Object> calcularMetricasDashboard(List<Venta> listaVentas) {
+    public Map<String, Object> obtenerMetricasPrincipales(LocalDate inicio, LocalDate fin, Integer idCategoria) {
         Map<String, Object> metricas = new HashMap<>();
 
-        // Registros del día
-        long registrosHoy = listaVentas.stream()
-                .filter(v -> v.getFechaVenta() != null && v.getFechaVenta().isEqual(LocalDate.now()))
-                .count();
+        BigDecimal totalVendido = ventaRepository.sumarIngresosPorRango(inicio, fin, idCategoria);
+        Long ventasRegistradas = ventaRepository.contarVentasPorRango(inicio, fin, idCategoria);
+        BigDecimal ventaPromedio = ventaRepository.obtenerTicketPromedioPorRango(inicio, fin, idCategoria);
 
-        // Total vendido
-        BigDecimal totalVendido = listaVentas.stream()
-                .map(Venta::getTotalVenta)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<Object[]> categorias = ventaRepository.agruparVentasPorCategoria(inicio, fin, idCategoria);
+        String categoriaTop = categorias.isEmpty() ? "N/A" : (String) categorias.get(0)[0];
 
-        // Venta promedio
-        BigDecimal ventaPromedio = BigDecimal.ZERO;
-        if (!listaVentas.isEmpty()) {
-            ventaPromedio = totalVendido.divide(BigDecimal.valueOf(listaVentas.size()), 2, RoundingMode.HALF_UP);
-        }
-
-        // Producto Top
-        String productoTop = "N/A";
-        if (!listaVentas.isEmpty()) {
-            productoTop = listaVentas.stream()
-                    .collect(Collectors.groupingBy(v -> v.getProducto().getNombre(), Collectors.counting()))
-                    .entrySet().stream()
-                    .max(Map.Entry.comparingByValue())
-                    .map(Map.Entry::getKey)
-                    .orElse("N/A");
-        }
-
-        metricas.put("registrosHoy", registrosHoy);
-        metricas.put("totalVendido", totalVendido);
-        metricas.put("ventaPromedio", ventaPromedio);
-        metricas.put("productoTop", productoTop);
+        metricas.put("totalVendido", totalVendido != null ? totalVendido : BigDecimal.ZERO);
+        metricas.put("ventasRegistradas", ventasRegistradas != null ? ventasRegistradas : 0L);
+        metricas.put("ventaPromedio", ventaPromedio != null ? ventaPromedio.setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        metricas.put("categoriaTop", categoriaTop);
 
         return metricas;
     }
 
+    // DATOS PARA GRÁFICA DE BARRAS
+    public Map<String, Object> obtenerDatosGraficaBarras(LocalDate inicio, LocalDate fin, Integer idCategoria) {
+        List<Object[]> datosCrudos = ventaRepository.agruparVentasPorDia(inicio, fin, idCategoria);
+        List<String> labels = datosCrudos.stream().map(obj -> obj[0].toString()).collect(Collectors.toList());
+        List<BigDecimal> data = datosCrudos.stream().map(obj -> (BigDecimal) obj[1]).collect(Collectors.toList());
+
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("labels", labels);
+        resultado.put("data", data);
+        return resultado;
+    }
+
+    // DATOS PARA GRÁFICA DE DONA
+    public Map<String, Object> obtenerDatosGraficaDona(LocalDate inicio, LocalDate fin, Integer idCategoria) {
+        List<Object[]> datosCrudos = ventaRepository.agruparVentasPorCategoria(inicio, fin, idCategoria);
+        List<String> labels = datosCrudos.stream().map(obj -> (String) obj[0]).collect(Collectors.toList());
+        List<BigDecimal> data = datosCrudos.stream().map(obj -> (BigDecimal) obj[1]).collect(Collectors.toList());
+
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("labels", labels);
+        resultado.put("data", data);
+        return resultado;
+    }
+
+    // TABLAS DE RANKINGS INFERIORES
+    public List<Object[]> obtenerRankingProductos(LocalDate inicio, LocalDate fin, Integer idCategoria) {
+        return ventaRepository.obtenerTopProductos(inicio, fin, idCategoria, PageRequest.of(0, 5));
+    }
+
+    public List<Object[]> obtenerRankingUsuarios(LocalDate inicio, LocalDate fin, Integer idCategoria) {
+        List<Object[]> usuarios = ventaRepository.obtenerTopUsuarios(inicio, fin, idCategoria);
+        return usuarios.stream().limit(5).collect(Collectors.toList());
+    }
 }
