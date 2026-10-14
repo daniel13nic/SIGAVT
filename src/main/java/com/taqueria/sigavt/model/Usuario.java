@@ -41,4 +41,9 @@ public class Usuario {
     @Column(nullable = false, length = 255)
     private String password;
 
+
+    @Column(name = "activo")
+    private Boolean activo = true;
+
+
 }

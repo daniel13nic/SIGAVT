@@ -5,15 +5,10 @@ import com.taqueria.sigavt.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
-import com.taqueria.sigavt.model.Usuario;
-import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -21,53 +16,56 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(
-            UsuarioRepository usuarioRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Obtener todos los usuarios (para el panel del Administrador)
     public List<Usuario> obtenerTodos() {
         return usuarioRepository.findAll();
     }
 
-    // Buscar usuario por ID
     public Optional<Usuario> obtenerPorId(Integer idUsuario) {
         return usuarioRepository.findById(idUsuario);
     }
 
-    // Buscar usuario por "username"
     public Optional<Usuario> obtenerPorUsername(String username) {
         return usuarioRepository.findByUsername(username);
     }
 
-    // Crear o actualizar un usuario de forma segura
+
+
     public Usuario guardarUsuario(Usuario usuario) {
-        if (usuario.getPassword() != null && !usuario.getPassword().trim().isEmpty()) {
-            if (!usuario.getPassword().startsWith("$2a$")) {
-                String hashSeguro = passwordEncoder.encode(usuario.getPassword());
-                usuario.setPassword(hashSeguro);
+        if (usuario.getIdUsuario() != null) {
+            Usuario existente = usuarioRepository.findById(usuario.getIdUsuario()).orElseThrow();
+
+            if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+                usuario.setPassword(existente.getPassword());
+            } else if (!usuario.getPassword().startsWith("$2a$")) {
+                usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+            }
+        } else {
+            if (usuario.getPassword() != null && !usuario.getPassword().startsWith("$2a$")) {
+                usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
             }
         }
         return usuarioRepository.save(usuario);
     }
 
-    // Eliminar un usuario
-    public void eliminarUsuario(Integer idUsuario) {
-        usuarioRepository.deleteById(idUsuario);
-    }
 
+
+    public void eliminarUsuario(Integer idUsuario) {
+        Usuario existente = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        existente.setActivo(false);
+        usuarioRepository.save(existente);
+    }
 
     public Map<String, Object> calcularMetricasUsuarios(List<Usuario> listaUsuarios) {
         Map<String, Object> metricas = new HashMap<>();
 
-        // Total general
         long totalUsuarios = listaUsuarios.size();
 
-        // Conteo por perfiles
         long totalAdmins = listaUsuarios.stream()
                 .filter(u -> u.getPerfil() != null && u.getPerfil().getNombre().toLowerCase().contains("administrador"))
                 .count();
@@ -76,15 +74,9 @@ public class UsuarioService {
                 .filter(u -> u.getPerfil() != null && u.getPerfil().getNombre().toLowerCase().contains("operador"))
                 .count();
 
-        long totalConsultores = listaUsuarios.stream()
-                .filter(u -> u.getPerfil() != null && u.getPerfil().getNombre().toLowerCase().contains("consultor"))
-                .count();
-
-
         metricas.put("totalUsuarios", totalUsuarios);
         metricas.put("totalAdmins", totalAdmins);
         metricas.put("totalOperadores", totalOperadores);
-        metricas.put("totalConsultores", totalConsultores);
 
         return metricas;
     }

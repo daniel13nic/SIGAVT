@@ -34,6 +34,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new User(
                 usuario.getUsername(),
                 usuario.getPassword(),
+                usuario.getActivo(),
+                true,
+                true,
+                true,
                 Collections.singletonList(authority)
         );
     }
