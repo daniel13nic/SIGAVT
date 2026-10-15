@@ -84,21 +84,22 @@ mvn spring-boot:run
 ```
 
 ### Using IDE
-1. Open the project in IntelliJ IDEA.
-2. Navigate to `src/main/java/com/taqueria/sigavt/SigavtApplication.java`.
-3. Right-click and select "Run 'SigavtApplication'".
+1. Abre el proyecto en IntelliJ IDEA.
+2. Navega hasta `src/main/java/com/taqueria/sigavt/SigavtApplication.java`.
+3. Haz clic derecho y selecciona "Run 'SigavtApplication'".
 
-The application will start on **port 8080** by default.
+La aplicación se iniciará en el **puerto 8080** por defecto.
 
 ### Access the Application
-Once running, you can access the application at:
-- Base URL: `http://localhost:8080`
-- Login Endpoint: `http://localhost:8080/login`
+Una vez que la aplicación esté en ejecución, puedes acceder a ella en:
+- URL Base : `http://localhost:8080`
+- Punto de acceso (Login): `http://localhost:8080/login`
 
 **Default Credentials:**
-A CommandLineRunner is configured to auto-encrypt the initial user on startup.
+
+El script de la base de datos incluye usuarios de prueba preconfigurados con contraseñas encriptadas de forma segura (BCrypt).
 - **Username**: `danieln`
-- **Password**: `admin1234567`
+- **Password**: `admin123`
 - **Role**: ADMINISTRADOR
 
 ## System Modules
