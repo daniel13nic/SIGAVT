@@ -55,20 +55,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*
-    @Bean
-    public CommandLineRunner inicializarCredenciales(UsuarioRepository usuarioRepo, PasswordEncoder encoder) {
-        return args -> {
-            usuarioRepo.findByUsername("danieln").ifPresent(usuario -> {
-                if (!usuario.getPassword().startsWith("$2a$")) {
-                    usuario.setPassword(encoder.encode("admin123"));
-                    usuarioRepo.save(usuario);
-                    System.out.println("==== CREDENCIAL ENCRIPTADA CON ÉXITO PARA: danieln ====");
-                }
-            });
-        };
-    }
-*/
 
     @Bean
     public org.springframework.security.authentication.AuthenticationManager authenticationManager(
